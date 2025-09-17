@@ -6,7 +6,7 @@ docaRecoder<-function(doca){
   }
   
   
-  speclist<-jsonlite::fromJSON('https://raw.githubusercontent.com/Neilblund/GVPT429KFall2025/refs/heads/main/Code/codebook.json')
+  #speclist<-jsonlite::fromJSON('https://raw.githubusercontent.com/Neilblund/GVPT429KFall2025/refs/heads/main/Code/codebook.json')
   
   labels<-speclist$labels
   # function to apply labels to variables
@@ -46,7 +46,17 @@ docaRecoder<-function(doca){
   doca<-doca|>
     dplyr::mutate(dplyr::across(matches('^claim[0-9]'), 
                                 .fns=~codebook(.x, speclist$general_claims), 
-                                .names='gen_{.col}'))
+                                .names='gen_{.col}'),
+                  
+                  
+                  )|>
+    dplyr::mutate(dplyr::across(matches('^form[1-4]'), 
+                                .fns=~codebook(.x, speclist$form_types), 
+                                .names='{.col}_type'),
+                  
+                  
+    )
+  
   
   
   
@@ -56,12 +66,4 @@ docaRecoder<-function(doca){
   
   return(doca)
 }
-
-
-
-         
-
-
-
-
 
