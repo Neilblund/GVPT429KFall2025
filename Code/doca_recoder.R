@@ -59,37 +59,6 @@ docaRecoder<-function(doca){
 
 
 
-doca$form_grouping<-factor(as.numeric(doca$form1), levels=group_levels, labels=group_labels)
-
-
-group_levels<-c(1, 2, 5, 4, 13, 14, 8, 16, 9, 15, 18)
-
-
-group_labels<- c(
-  "Rallies,Demonstrations",
-  "Rallies,Demonstrations",
-  "Withholding obligations",
-  "Withholding obligations",
-  "Withholding obligations",
-  "Withholding obligations",
-  "Conventional",
-  "Conventional",
-  "Conventional",
-  "Conventional",
-  "Conventional"
-)
-
-
-doca_selected<-doca|>
-  drop_na(form_grouping, smonamed)
-
-
-doca_selected|>
-  count(smonamed, form_grouping)|>
-  group_by(smonamed)|>
-  mutate(total = sum(n),
-         proportion =  n/total)
-         
          
 
 
