@@ -1,0 +1,656 @@
+---
+title: "Working with the Dynamics of Collective Action data"
+editor: visual
+format:
+  html:
+    df-print: paged
+    toc: true
+    toc-location: left
+    toc-depth: 4
+    smaller: true
+    self-contained: true
+    code-annotations: hover
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+```
+
+
+# Introduction
+
+In the last class we talked about the process of collecting protest event data to study contentious behavior. In this class, we'll explore a large-scale example of this sort of data set called the [Dynamics of Collective Action (DOCA)](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/ABLN5Y) dataset.
+
+DOCA covers U.S. collective action events from 1960 through 1995. To qualify as an event, an incident must meet the following criteria:
+
+1. It must be collective
+2. Participants must make a "claim" that seeks to change society in some important way.
+3. Events are not initiated by elites or management (i.e. they would count an event that was initiated by entirely by elected officials or police)
+4. Must be some form of protest (so fundraising or closed group meetings don't count)
+
+The data were gathered by coders systematically skimming the news sections of the New York Times for each day, identifying any articles that mentioned a qualifying event, and then manually coding the characteristics of each protest event. You can read way more than you'd ever want to know about this process in this [document](https://dataverse.harvard.edu/api/access/datafile/10991681)
+
+
+Note DOCA is no longer being continuously updated, and it only covers the U.S., but there are lots of other sources for protest event data. Two of these are worth highlighting here because we'll explore them in a later class:
+
+- [Armed Conflict Location Event Data (ACLED)](https://acleddata.com/) 
+- [Crowd Counting Consortium (CCC)](https://ash.harvard.edu/programs/crowd-counting-consortium/)
+
+
+## Packages
+
+
+We'll be making extensive use of [tidyverse packages](https://www.tidyverse.org/packages/) in this course. These packages are designed with a shared set of rules in mind and so it can simplify a lot of complicated data analysis problems that would otherwise require you to write a lot of R code.
+
+For this project, we're also going to use the [`dataverse`](https://cran.r-project.org/web/packages/dataverse/vignettes/A-introduction.html) R package, which will let us download the Dynamics of Collective Action data.
+
+If you don't have it already, you'll want to start by installing the tidyverse packages. Remove the `#` to un-comment the line below, and then run it in R.
+
+```{r, eval=FALSE}
+
+#install.packages("tidyverse")
+#install.packages('dataverse')
+#install.packages("haven")
+
+```
+
+Remember that you'll only need to install a package once, but you'll need to run `library(packagename)` at the top of your script every time your restart R in order to use any functions from that package.
+
+We'll load both the tidyverse and dataverse packages.
+
+```{r}
+
+library(tidyverse)
+library(dataverse)
+
+
+```
+
+## Retrieving the data
+
+The Dynamics of Collective Action data is stored on the Harvard Dataverse. You can view more information about the project by checking out this link:
+
+> <https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/ABLN5Y>
+
+We *could* download the data by simply going to the webpage and clicking the right links, but the `dataverse` package will let us import this data without having to leave R.
+
+To do this, we'll use the function `get_dataframe_by_name`. 
+
+
+
+
+```{r}
+
+
+doca_raw <- get_dataframe_by_name(
+  filename = 'Dynamics_of_Collective_Action.tab',  #<1>
+  dataset = 'doi:10.7910/DVN/ABLN5Y',              #<2>
+  server = 'dataverse.harvard.edu',                #<3>
+  original = TRUE,                                 #<4>  
+  .f = haven::read_dta                             #<4>
+)
+
+
+
+```
+
+1. The name of the file we want to download. 
+2. The Digital Object Identifier (DOI). You can find this by going to the "metadata" section on the link above, but you can also see it's written at the end of the URL.
+3. The dataverse server. This is just the first part of the URL above after `https://`
+4. These two arguments will often be left out. In this case, the original data is saved in `.dta` format, so we need to include some additional code to translate this format into something that R can interpret. 
+
+If you're using Rstudio, you should see `doca` pop up in the window at the top-right of your screen. If you click on the name, you can bring up a view of the data set. Alternatively, you can use the `slice_head` function to view the first few rows in the console.
+
+```{r}
+
+slice_head(doca_raw, n = 10)
+
+```
+
+One thing you might notice here is that many of the variables are represented with numbers instead of descriptive text. This is common - especially with older data sets - and you'll normally need to do a little leg work to get things like this into a usable format. In this case, however, I've put together a script that will do a lot of the tedious stuff for you automatically.
+
+To use it, you can just run this script to import the `docaRecoder` function and then apply it to "doca_raw" as shown below:
+
+```{r}
+
+source('https://raw.githubusercontent.com/Neilblund/GVPT429KFall2025/refs/heads/main/Code/doca_recoder.R')
+
+doca<-docaRecoder(doca_raw)
+
+
+
+```
+
+If you've successfully done the recoding, the code below should return a table with "Yes" or "No" values, rather than 1s or 0s:
+
+```{r}
+
+
+table(doca$viold)
+
+```
+
+### Using the codebook
+
+When browsing the data, you'll probably notice that some columns are self-explanatory, but other columns are a little harder to parse: columns names like `particex` don't have an obvious interpretation.
+
+Data that we work with in this class will not always come with clear variable names or value labels, so you'll need to consult the [codebook](https://dataverse.harvard.edu/file.xhtml?fileId=10991687&version=1.0) and other documentation, all of which are available on the dataverse site.
+
+#### Question 1
+
+**Which column contains the year the event occurred? How would I access its values?**
+
+```{r q1}
+# Q1
+
+
+```
+
+## Using pipes
+
+The `|>` operator (or sometimes `%>%`) is a way of making code a little more readable and less repetitive by "piping" data from one function to the next. For instance, if I wanted to find the earliest event in the DOCA data, I could use the `min` function like this:
+
+```{r}
+
+min(doca$evyy, na.rm=T)
+
+```
+
+Or I could rewrite this statement by piping the data forward like this:
+
+```{r}
+
+doca$evyy|>min(na.rm=T)
+
+```
+
+This might seem kind of pointless in the current example, but the real advantage becomes more clear when you're doing a bunch of different things to a bit of data. For instance, if I wanted to calculate the proportion of violent and non-violent protest in 1980 I would need to do the following:
+
+1.  Get the subset of the data where `evyy` (event year) is 1980)
+2.  Select the `viold` column (which is "yes" if the protest was violent and "no" otherwise
+3.  Create a frequency table using the `table` command
+4.  Convert the frequencies to proportions using `prop.table`
+
+I could do all these steps in one line with a series of nested parentheses, but writing the code that way is hard to read:
+
+```{r}
+
+prop.table(table(subset(doca, evyy == 1980, select = viold)))
+
+```
+
+Here's how I could rewrite that using pipes:
+
+```{r}
+doca|>
+  subset(evyy==1980, select=viold)|>
+  table()|>
+  prop.table()
+
+```
+
+You're not required to use this, and there's never going to be a case where you can only write a particular piece of code by using a pipe. However you will see it come up a fair bit in code I share with the class and other written guides on using tidyverse packages, so at a bare minimum you want to know how to interpret it.
+
+## Filtering
+
+We'll often want to remove rows that match a condition from a data set entirely. For instance: there's a single protest even in the DOCA data set that takes place in 1955. There's a reason for this in the coding rules, but in practice it makes for a lot of nonsensical plots, so we usually just want to remove it before doing anything.
+
+The `subset` function is a way to do this in base R, but I'll often use the `filter` function to accomplish the same thing (mostly out of habit). We can give filter a logical expression and it will keep only rows where that expression is `TRUE`
+
+```{r}
+
+# keep only rows that are after 1955
+doca<-doca|>
+  filter(evyy > 1955)
+
+# now the minimum year should be 1960
+min(doca$evyy, na.rm=T)
+
+```
+
+Keep in mind that a filter removes rows from the data set, so you want to be careful that you're not throwing away information you might want to use elsewhere in your analysis. If you just want to temporarily get a subset of some data, you can always just assign your results to a new variable:
+
+```{r assigning results to a new variable}
+
+# create a new variable with only the 1980 results
+doca_1980<-doca|>
+  filter(evyy == 1980)
+
+# check the number of rows remaining: 
+nrow(doca_1980)
+```
+
+#### Question 2
+
+How would I create a data set containing only the events where police were killed?
+
+```{r q2}
+#Q2
+
+
+```
+
+## Counting observations
+
+Since many social science variables are categorical, many of our analyses will involve counting the number of observations with a particular value. We can use the `table` function to get counts of a particular category for some quick analysis, but we'll also use the `dplyr` function `count` or `summarize` to get the same result.
+
+### Using table
+
+For instance, if we want to create a table with a count of events in each state, we could run:
+
+```{r}
+
+# count the number of events per state
+state_tab<-table(doca$state1)
+
+# View the first five states:
+state_tab[1:5]
+```
+
+We could sort this from highest to lowest using the `sort` function with the `decreasing=T` option. (the default will sort from highest to lowest, but this will give us values from lowest to highest)
+
+```{r}
+
+sort(state_tab, decreasing=T)
+
+```
+
+And we can use the `[]` operator to get a subset of the data. This code translates as "sort the data from highest to lowest, and then show the 1st through the 10th value":
+
+```{r}
+sorted_tab <- sort(state_tab, decreasing=T)
+
+sorted_tab[1:10]
+```
+
+Finally, I can convert the raw frequencies to proportions by using the `prop.table` function
+
+```{r}
+
+prop.table(sorted_tab)[1:10]
+
+```
+
+Why are there so many more New York events? Does this real differences in protest activity or is there some other explanation?
+
+### Using count
+
+The `table` function works for quick analyses, but we'll often use the dplyr `count` function instead. You'll notice some differences in the way output from `count` vs. `table` are formatted, but both should be reasonably straightforward to interpret:
+
+
+```{r}
+doca|>
+  # count the number of events by state and sort
+  count(state1, sort=T)|>
+  # show the top 10 rows
+  slice_head(n=10)
+
+
+```
+
+To turn my raw counts into proportions, I'll need to divide `n` (the count of events per state) by the total number of events (the sum of `n`). 
+
+To do this, I'll use the `mutate` function to add a new variable to my data:
+
+```{r}
+
+state_proportions <- doca|>
+  # count the number of events by state and sort
+  count(state1, sort=T)|>
+  # use mutate to add a new column 
+  mutate(proportion = n/sum(n))
+
+
+```
+
+#### Question 3
+
+**How would I calculate the number of events per year using the count function? How would I calculate this for violent protests only?**
+
+```{r q3}
+#
+
+
+```
+
+## Making comparisons
+
+When making inferences, we often need to make a comparison across one or more groups. For instance, if someone argued that "protests where counter demonstrators were present were more likely to become violent compared to protests without them", then I would want to:
+
+1.  count the number of events with and without counter demonstrators
+2.  calculate the proportion of events in each group that were violent vs. non-violent.
+
+We can easily add another variable to the count function like this (and we can use the `drop_na` function to remove missing data)
+
+```{r}
+
+vc_count<-doca|>
+  count(counterd, viold)|>
+  # remove rows with missing data:
+  drop_na()
+
+
+vc_count
+
+```
+
+... but how do we accomplish step 2 and calculate the proportions within each group? The code we used earlier doesn't quite give us what we want because it divides each count by the total number of protest events. But we actually want the proportion of violent protests among protests with counter-demonstrators and those without.
+
+```{r}
+vc_count|>
+  # count the number of events by state and sort
+  # use mutate to add a new column 
+  mutate(proportion = n/sum(n))
+
+```
+
+To do get this, we can use the `group_by` function to group rows together based on a a selected characteristic. On its own, `group_by` doesn't do much, but when we use it with `mutate`, we get a different result:
+
+```{r}
+
+proportion_by_group<-vc_count|>
+  group_by(counterd)|>
+  mutate(proportion = n /sum(n))
+
+proportion_by_group
+```
+
+Based on these results, we should be able to tell whether events with counter-demonstrators were more likely to turn violent.
+
+```{r}
+
+
+
+```
+
+#### Question 4
+
+`propdam` is a "Yes/No" variable that indicates whether property damage occurred at an event. `smonamed` is a "Yes/No" variable that indicates whether a social movement organization was involved in the event. **Is property damage more or less likely at events where a social movement organization was involved?**
+
+```{r q4}
+#
+
+
+```
+
+## Recoding with `case_when`
+
+In many cases, we may want to collapse categorical variables or create new ones based on one or more conditions. For instance: the `gen_claim1, gen_claim2, gen_claim3, gen_claim4` variables are used to indicate up to four different claims or concerns made by protesters at each event.
+
+Somewhat confusingly, *protests both for and against a particular case can be counted under the same claim category*. So, we can see that a substantial share of protests listed related to African American Civil Rights were actually protests in opposition to the Civil Rights Movement:
+
+```{r}
+
+doca|>
+  filter(gen_claim1 == 'Civil Rights--African Americans')|>
+  count(gen_claim1, val1)
+
+
+
+
+```
+
+We might want to create a new variable that allows us to distinguish between pro- and anti- AA Civil Rights demonstrations.
+
+An easy way to do this using dplyr functions is with `case_when`. The basic syntax here will be `case_when(variable == somevalue ~ "label")` . Which you can interpret as "if the statement is true, then assign this label.
+
+Here's an example of how I might use this to create a new variable that categorizes protests as either "Pro African American Civil Rights", "Anti African American Civil Rights", or "Neither" based on the first general claim code:
+
+```{r}
+
+
+
+doca<-doca|>
+  mutate(
+    aa_civil_rights = 
+      case_when(gen_claim1 == 'Civil Rights--African Americans' & val1 == "In favor" ~ "Pro AA Civil Rights",
+    gen_claim1 == 'Civil Rights--African Americans' & val1 == "In opposition" ~ "Anti AA Civil Rights",
+    .default = "Neither"
+    )
+  )
+    
+
+doca|>
+  count(aa_civil_rights)
+
+
+```
+
+#### Question 5
+
+**Since there can be up to four general claims for any given protest, how would I create a new variable that indicates whether any of the four listed claims dealt with African American civil rights issues?**
+
+```{r}
+# Q5
+
+  
+
+```
+
+## Plotting a result
+
+You can use `ggplot` to create graphics from the data we've assembled here.
+
+We'll get more into the mechanics of using `ggplot` in later classes, but just to get a basic sense of how this will work, here's an example of how you could plot the number of events by year:
+
+```{r}
+
+yearly_events<-doca|>
+  count(evyy)
+
+event_counts<-ggplot(yearly_events, aes(x=evyy, y=n)) + 
+  geom_line() +
+  xlab("Year") +
+  ylab("Total events")
+
+event_counts
+
+
+```
+
+We can break this down one step at a time to get a better sense of what's happening:
+
+The first two lines in the code above just count the number of events by year.
+
+```{r}
+yearly_events<-doca|>
+  count(evyy)
+yearly_events
+
+```
+
+The next command tells R to create a `ggplot` object that will use the `yearly_events` data we just created. the `aes(x=evyy, y=n))` portion specifies what variables from our data set will go on the x and y axes. (But notice that we haven't actually plotted the data here, we've just set up an empty space)
+
+```{r}
+
+event_counts <- ggplot(yearly_events, aes(x=evyy, y=n))
+event_counts
+
+```
+
+Adding `geom_line()` to the plot to tell R to plot a line with the data (the `+` sign for `ggplot` objects works a bit like the `|>` we used above)
+
+```{r}
+
+
+event_counts <- ggplot(yearly_events, aes(x=evyy, y=n)) + 
+  geom_line()
+event_counts
+```
+
+Finally, we add `xlab` and `ylab` to give a different name to the x and y axis:
+
+```{r}
+
+event_counts<-ggplot(yearly_events, aes(x=evyy, y=n)) + 
+  geom_line() +
+  xlab("Year") +
+  ylab("Total events")
+
+event_counts
+
+```
+
+ggplot makes it really easy to add additional geometries to a single plot. Try adding `+geom_point()` to the `event_counts` graph below:
+
+```{r}
+
+event_counts<-ggplot(yearly_events, aes(x=evyy, y=n)) + 
+  geom_line() +
+  xlab("Year") +
+  ylab("Total events")
+
+
+
+```
+
+While R's base plotting package can do pretty much anything you might want, the advantages of ggplot will become more apparent when we start doing more complicated things like plotting multiple variables in the same plot.
+
+Here's an example of plotting violent and non-violent events separately. Notice that we only have to change one thing: we add the `color = viold` to the `aes` argument for our initial ggplot:
+
+```{r}
+
+yearly_events<-doca|>
+  count(evyy, viold)|>
+  drop_na()
+
+ggplot(yearly_events, aes(x=evyy, y=n, color=viold)) + 
+  geom_line() +
+  xlab("Year") +
+  ylab("Total events") +
+  # adding a legend title:
+  labs(color = 'Violence used?')
+
+```
+
+## Question 6 (Do on your own)
+
+
+Scholars who study protest policing argue that police interactions with protesters started to shift after the 1960s, as more police departments began to adopt less confrontational methods of protest policing. Can we identify this shift in the Dynamics of Collective Action data?
+
+
+Calculate the proportion of protests where police used some kind of physical force (`police3`) before 1969 and after 1969. State whether your findings are consistent or inconsistent with the argument about shifts in protest policing.
+
+
+
+```{r}
+# Code here
+
+  
+
+
+```
+
+
+
+# Functions referenced
+
+## slice\_\*
+
+`slice_head`, (and `slice_tail`, `slice_min`, and `slice_max`) will extract a subset of a data set. Slice head just gets the first `n` rows:
+
+```{r}
+
+doca|>
+  slice_head(n=5)
+
+
+```
+
+## \|\> (pipes)
+
+`|>` or the "pipe operator" will take data from the left hand side and "pipe" it to a function on the right hand side. For instance:
+
+```{r}
+nrow(doca)
+
+```
+
+...can be expressed as:
+
+```{r}
+doca|>nrow()
+
+```
+
+## filter
+
+`filter` will take a logical expression and return rows where that expression evaluates as `TRUE`
+
+```{r}
+
+doca|>
+  filter(eventid == '6001009')
+
+
+```
+
+## count
+
+`count` will count the number of rows based on one or more groups. (this works very similarly to `table` but it returns a `tibble` object).
+
+```{r}
+# counting violent events
+doca|>
+  count(viold)
+
+```
+
+You can set the `sort` option to TRUE to sort all of the counts from lowest to highest
+
+```{r}
+
+doca|>
+  count(viold, sort=TRUE)
+
+```
+
+## arrange
+
+`arrange` will filter rows of a data set by some value. Using a `-` in front of a variable name will sort from highest to lowest instead of lowest to highest:
+
+```{r}
+
+doca|>
+  # sort from highest to lowest
+  arrange(-evyy)|>
+  # take the top 10 rows
+  slice_head(n=10)
+
+```
+
+## mutate
+
+`mutate` will add a new column to a data set. We used it in a prior example to add a total or a proportion to the data set returned from the `count` function:
+
+```{r}
+
+doca|>
+  count(state1)|>
+  mutate(total_events = sum(n))
+
+```
+
+## group_by
+
+`group_by` is used to create a grouped data frame. On its own, this doesn't do much, but functions like `mutate` and `slice_head` and `summarize` will allow us to do calculations over groups instead of operating on the entire data set.
+
+For example the code below gets the first event in each year:
+
+```{r}
+
+# get the first listed event in each year: 
+doca|>
+  group_by(evyy)|>
+  slice_head(n=1)
+
+```
+
+
+
+
+
+
+
