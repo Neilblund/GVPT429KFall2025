@@ -6,7 +6,7 @@ docaRecoder<-function(doca){
   }
   
   
-  #speclist<-jsonlite::fromJSON('https://raw.githubusercontent.com/Neilblund/GVPT429KFall2025/refs/heads/main/Code/codebook.json')
+  speclist<-jsonlite::fromJSON('https://raw.githubusercontent.com/Neilblund/GVPT429KFall2025/refs/heads/main/Code/codebook.json')
   
   labels<-speclist$labels
   # function to apply labels to variables
