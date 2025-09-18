@@ -1,0 +1,33 @@
+---
+title: "Homework 1"
+output: 
+  html_document:
+    toc: true
+    code_download: true
+    df-print: paged
+name: "YOUR NAME"
+date: "2025-09-18"
+
+---
+
+```{r setup, include=FALSE}
+
+# leave this part as-is
+
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning =FALSE)
+```
+
+# Section header
+
+Put your answers in text 
+
+
+```{r}
+# Put R code inside of an R chunk.
+
+
+```
+
+
+
+When you're finished, press `CTRL + SHIFT + K` to create an HTML document with your response (or just click the "knit" button at the top of the page)
