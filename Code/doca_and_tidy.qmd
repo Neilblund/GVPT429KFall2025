@@ -525,13 +525,13 @@ ggplot(yearly_events, aes(x=evyy, y=n, color=viold)) +
 
 ```
 
-## Question 6 (Do on your own)
+# Question 6 (Do on your own)
 
 
 Scholars who study protest policing argue that police interactions with protesters started to shift after the 1960s, as more police departments began to adopt less confrontational methods of protest policing. Can we identify this shift in the Dynamics of Collective Action data?
 
 
-Calculate the proportion of protests where police used some kind of physical force (`police3`) before 1969 and after 1969. State whether your findings are consistent or inconsistent with the argument about shifts in protest policing.
+Calculate the proportion of protests where police used some kind of physical force (`police3`) before 1969 and after 1969. State whether your findings are consistent or inconsistent with the argument about changes toward more "gentle" methods of protest policing after the late 60s.
 
 
 
