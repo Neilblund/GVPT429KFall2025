@@ -1,0 +1,410 @@
+---
+title: "Working with the Dynamics of Collective Action data"
+editor: visual
+format:
+  html:
+    df-print: kable
+    toc: true
+    toc-location: left
+    toc-depth: 4
+    smaller: true
+    self-contained: true
+    code-annotations: hover
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+```
+
+
+
+```{r}
+
+library(tidyverse)
+library(dataverse)
+
+# loading the data from the Dynatmics of collective action dataverse
+doca_raw <- get_dataframe_by_name(
+  filename = 'Dynamics_of_Collective_Action.tab',  
+  dataset = 'doi:10.7910/DVN/ABLN5Y',             
+  server = 'dataverse.harvard.edu',                
+  original = TRUE,                                 
+  .f = haven::read_dta                            
+)
+
+
+# importing a custom function to add variable labels to the raw data
+source('https://raw.githubusercontent.com/Neilblund/GVPT429KFall2025/refs/heads/main/Code/doca_recoder.R')
+
+doca<-docaRecoder(doca_raw)|>
+  filter(evyy>1955)
+
+
+
+```
+
+
+
+
+## Question 6
+
+
+*Calculate the proportion of protests where police used some kind of physical force (`police3`) before 1969 and after 1969. State whether your findings are consistent or inconsistent with the argument about changes toward more "gentle" methods of protest policing after the late 60s.*
+
+
+
+
+Step 1 is to create a variable that indicates whether an event happened before or after 1969. In this example, I'm using `mutate` to create a new variable that will be `TRUE` if `evyy` is greater than or equal to 1969, and `FALSE` otherwise. 
+
+The next step is applying a `count` to get a count of events for each of the four possible combinations of my two variables of interest: pre and post 1969 and police did or did not use force. Finally, I'm using `drop_na` to get rid of any `NA` values in the data (there's only a handful of these, and they represent cases where this information is missing, so there's not much else we can do but just get rid of them)
+
+```{r}
+
+
+counts<-doca|>
+  mutate(post_1969 = evyy >=1969)|>
+  count(post_1969, police3)|>
+  drop_na()
+  
+
+# viewing the result:
+counts
+
+
+
+```
+
+Step 2 would be to convert the raw frequencies into proportions. The question asked you to calculate the proportion of events where police used force before and after 1969, so the denominator in that fraction should be the total number of events before and after 1969. 
+
+I can get the total number of events in each category by using `group_by` with `mutate` and then getting the sum of the `n` column. Then I can get a proportion by dividing each value of `n` by the sum of `n` in each group:
+
+
+```{r}
+
+proportions<-counts|>
+  group_by(post_1969)|>
+  mutate(total = sum(n),
+         proportion = n / total
+         )
+
+proportions
+
+```
+
+Here's what that looks like if I do steps 1 and 2 all together with a series of pipes:
+
+```{r}
+
+proportions<-doca|>
+  mutate(post_1969 = evyy >=1969)|>
+  count(post_1969, police3)|>
+  drop_na()|>  
+  group_by(post_1969)|>
+  mutate(total = sum(n),
+         proportion = n / total
+         )
+
+
+```
+
+
+Step 3 is just interpreting the results: before 1969 police used force in around 16% of encounters with protesters. After 1969, that number dropped to a little over 5%. So that's definitely consistent with the claim.
+
+
+```{r}
+
+proportions
+
+
+```
+
+## Plotting the result
+
+This wasn't required for this question, but visualizing data like this is a useful skill to work on for future analyses.
+
+
+Instead of standard R plots, we'll use the `ggplot` library to create most of our data visualizations in this class.
+
+Creating a ggplot object will always start with a call to `ggplot`, along with an argument that specifies the `data` and a `mapping` that tells R what data values go on the x and y axes. Then we'll add one or more geometries with functions like `geom_bar()`, `geom_line()`, `geom_point()` etc.
+
+
+```{r}
+ggplot(data = proportions, 
+       mapping = aes(x=post_1969, y=proportion, fill=police3)) +           #<1>
+  geom_bar(stat='identity')                                                #<2>
+
+
+```
+1. The `ggplot` function will take a data argument and a mapping argument. Here, we're using the `proportions` data for the data, we're placing `post_1969` on the x axis, and the y-axis will be determined by values of `proportion`. Finally, `fill=police3` is going to color-code our bars so that we can distinguish the "yes" and "no" values from each other. We'll use the `+` to add additional layers to our basic plot. 
+2. `geom_bar()` creates a bar plot. The `stat="identity"` argument just tells R that the height of each bar should be determined by the values of `proportion`.
+
+
+
+
+
+## Alternative visualizations
+
+The code above gives us a basic bar plot that visualizes our results, but ggplot gives us a bunch of additional customization options. You can click the tabs below to view code for some alternative ways to visualize this relationship.
+
+::: {.panel-tabset style="background-color: #ADD8E6"}
+
+
+### Adding labels
+
+This simplest thing we could do here would be to add labels and maybe change the theme away from the default. You can see the code for doing that below. If you hover your mouse over the numbered circles you can see a little more detail on what each line of code is accomplishing. Alternatively, you can try running this code while leaving out some lines to see how each argument changes the look of the plot.
+
+```{r}
+
+
+proportions|>
+  ggplot(mapping = aes(x = post_1969, y = proportion, fill=police3)) +    
+  geom_bar(stat = 'identity') +                                           
+  labs(x = "Time period",                                                 #<1>
+       y = "Percentage of events",                                        
+       fill = 'Did police use force?') +
+  scale_y_continuous(labels = scales::percent) +                          #<2>
+  theme_bw()                                                              #<3>
+  
+
+```
+1. The `labs` function adds additional labeling to the plot. Here, I'm adding x and y-axis labels, as well as a title over the part of the legend that explains what the bar colors mean.
+2. This changes the y axis from using a proportion scale to a percentage scale.
+3. Changing the theme just changes some minor aspects of the appearance. Notice that the background is now white instead of grey. You can see more theme options [here](https://ggplot2.tidyverse.org/reference/ggtheme.html)
+
+
+### New colors
+
+Another fairly easy thing to do is change the default color scheme and use a side-by-side bar plot instead of stacking:
+
+```{r}
+
+
+proportions|>
+  ggplot(mapping = aes(x = post_1969, y = proportion, fill=police3)) +      
+  geom_bar(stat = 'identity', position='dodge') +                            #<1>                
+  labs(x = "Time period",                                                 
+       y = "Percentage of events",                                        
+       fill = 'Did police use force?') +
+  scale_y_continuous(labels = scales::percent) +                          
+  theme_bw() +
+  scale_fill_manual(values = c('orange', 'lightblue'))                       #<2>
+  
+
+```
+1. `postion='dodge'` will change our output from a stacked bar chart to a version where bars are plotted side-by-side
+2. `scale_fill_manual` will let us specify different color codings for the bar values. We can either reference the name of a color or we can use an [HTML hex code](https://htmlcolorcodes.com/) to get really fine-grained control over the coloring. We can also use any number of [pre-made palettes](https://r-graph-gallery.com/color-palette-finder). 
+
+### Simplified bars
+
+Since the outcome of interest here is dichotomous, I don't necessarily need to include the proportion of "Yes" and the proportion of "No" values in the visualization: if you know police used violence in 15% of events, then you also know that they didn't use violence in the remaining 85%. So we could do a little filtering to simplify our plot and the interpretation of our results:
+
+
+```{r}
+
+proportions|>
+  filter(police3 == "Yes")|>                                                    #<1>
+  mutate(post_1969 = factor(post_1969,                                          #<2>
+                            levels=c(FALSE, TRUE),                              
+                            labels=c("Before 1969", "1969 or later")))|>
+  ggplot(mapping = aes(x = post_1969, y = proportion)) +                        #<3>
+  geom_bar(stat = 'identity') +          
+  labs(x = "Time period", 
+       y = "Percentage of events where police used force") +                    #<4>
+  scale_y_continuous(labels = scales::percent) +                               
+  theme_bw()                                                                  
+  
+
+
+```
+1. Since the outcome here is dichotomous, I don't really **need** to include the percentage of cases where police didn't use violence in order to show the comparison i'm interested in making, so I've filtered it out for this plot.
+2. Instead of having the x-axis say "TRUE" and "FALSE" I can create a factor variable that gives more descriptive factor labels to these values.
+3. Since I'm only using the cases where police used violence for this plot, I don't need the color-coding on my bars any more, so the `fill=` argument is left out here.
+4. Since I changed what my bars represent, I also need to modify the labels to match what my plot is showing.
+
+
+
+
+### Using a line
+
+Instead of using a bar plot, I could just show the proportion of events in each year where police used violence, and then maybe add a mark to the plot to indicate the year 1969.
+
+
+
+```{r}
+
+yearly_counts<-doca|>   
+  count(evyy, police3)|>
+  group_by(evyy)|>
+  mutate(proportion = n /sum(n))|>
+  drop_na()|>
+  filter(police3=="Yes")
+
+```
+
+
+
+Here's what it looks like using just the line plot:
+
+```{r}
+# just the line plot:
+ggplot(yearly_counts, aes(x=evyy, y=proportion)) + 
+  geom_line()
+
+
+
+```
+
+
+
+```{r}
+
+# The line plot with additional annotations
+ggplot(yearly_counts, aes(x=evyy, y=proportion)) +                  
+  geom_line() +
+  geom_vline(xintercept=1969,                                            #<1>
+             lty=2,
+             color='red'                       
+             ) +
+  scale_y_continuous(labels = scales::percent)  +
+  theme_bw() +
+  labs(x = "Year",
+       y = "% of events where police used force",
+       title = "Police use of force against protesters by year (1960 - 1995)",
+       caption = "Source: Dynamics of Collective Action"
+       )
+
+
+```
+1. Adding a vertical line at 1969. The `lty` argument makes it a dashed line. The `color='red'` does...exactly what you can probably guess.
+
+### Using a  table
+
+Instead of a bar plot, we might choose to display this information in a table. There are a lot of packages that can help you put together a nicely formatted table in R. I think [`gtsummary`](https://www.danieldsjoberg.com/gtsummary/index.html) is a nice option for something like this. 
+
+
+
+```{r}
+# install.packages('gtsummary')
+library(gtsummary)
+
+doca|>
+    mutate(post_1969 = factor(evyy>=1969,                                     #<1>      
+                            levels=c(FALSE, TRUE),                             
+                            labels=c("Before 1969", "1969 or later"))
+           )|>
+             select(police3, viold, propdam, post_1969)|>                                     #<2>
+             tbl_summary(by = post_1969)|>                                    #<3>
+  add_p()                                                                     #<4>
+
+
+
+```
+1. We'll create `post_1969` here but add factor labels to improve the readability of our plot.
+2. Selecting just a subset variables of interest from our data set. DOCA has over 100 variables, so to keep our table a manageable size we'll just look at a couple of the more interesting categories.
+3. `tbl_summary` will create our table. The `by` argument will give us separate summary statistics for each level of `post_1969`
+4. `add_p` will add a p-value to the table to help us determine whether an observed relationship is statistically significant. The p-value here is based on a chi-squared test, and it tells us the probability of seeing a disparity at least this large due to random sampling error. Since this value is very small, it suggests there's a non-random relationship between these two variables.
+
+:::
+
+
+
+
+## Accounting for confounding
+
+The overall results here consistent with the claim that policing changed after 1969, but there might be some reason for skepticism that these changes were **solely** the result of re-training police. For instance: perhaps protesters were more likely to use violence or damage property prior to 1969? If that were the case, then the changes in policing would mostly just be the result of changes to protester behavior. 
+
+One way to find some evidence of this would be to separately analyze the results looking at events where protesters used violence compared to events where protesters didn't use violence. We could do this as totally separate analyses, but the code below gives us the trend lines for police use of force at violence and non-violent events for each year from 1960 to 1995:
+
+
+```{r}
+
+yearly_counts<-doca|>   
+  count(evyy, police3, viold)|>
+  group_by(evyy, viold)|>
+  mutate(proportion = n /sum(n))|>
+  drop_na()|>
+  filter(police3=="Yes")
+
+ggplot(yearly_counts, aes(x=evyy, y=proportion, color=viold)) +                  
+  geom_line() +
+  geom_vline(xintercept=1969,                                           
+             lty=2,
+             color='red'                       
+             ) +
+  scale_y_continuous(labels = scales::percent)  +
+  theme_bw() +
+  labs(x = "Year",
+       y = "% of events where police used force",
+       title = "Police use of force against protesters by year (1960 - 1995)",
+       caption = "Source: Dynamics of Collective Action",
+       color = 'Did protesters use violence?'
+       )
+
+
+```
+
+Looking at the results, the trend lines appear similar, although the decline in use of force for non-violent protests appears to have started a little earlier compared to the non-violent events. Police use of force against peaceful protesters is consistently lower compared to use of force against violent protesters, but there is substantially more violence prior to 1969 for both lines. 
+
+
+
+### For the ambitious: using a logistic regression model
+
+
+We might want to consider lots of additional variables simultaneously to see whether the hypothesized relationship is robust after including additional controls. [In their 2009 paper](https://meridian.allenpress.com/mobilization/article-abstract/14/1/1/82209), Sarah Soule and Christian Davenport look at a whole range of control variables to explore the factors that influence the deployment of force from 1960 through 1990. We won't attempt to replicate their entire analysis here, but we can do a small-scale version of their analysis without too much extra legwork.
+
+
+
+Since our outcome of interest is a dichotomous variable (police either use force or they don't) then we can use a logistic regression model to estimate the effect of multiple independent variables on the logged-odds of the outcome.
+
+We'll do a little pre-processing to get this data in a better format for a regression:
+
+```{r}
+
+model_data<-doca|> 
+  filter(particd == "Yes")|>                                                    #<1>
+  mutate(post_1969 = factor(evyy>=1969,                                         #<2>    
+                            levels=c(FALSE, TRUE),                             
+                            labels=c("Before 1969", "1969 or later")),          #<3>
+         police_force = police3 =="Yes",                                        #<4>
+         log_participants = log(particex)                                       #<5>
+  )
+
+
+```
+1. The `particd` variable just reflects whether or not there's a crowd size estimate for an event, so this filter will ensure we only have cases where we have an estimate of the crowd size.
+2. We'll make the dichotomous variable for whether an event was before or after 1969, and we'll add some labels, which can make our output more readable. 
+3. We'll convert our depenent variable (did police use force?) to a boolean value so that we can use it as the dependent variable in our regression model.
+4. The estimated number of participants is highly skewed (a handful of very large values), and the effect of crowd size on police behavior is probably non-linear anyway. Taking the natural log of this variable will have the effect of "squishing" skewed numeric data into something that more closely resembles a normal distribution.
+
+
+
+Now we can use a `glm` with `family='binomial'` to estimate a logistic regression model:
+
+```{r}
+model<-glm(police_force  ~ post_1969  + propdam  + log_participants , 
+           data=model_data, family='binomial')
+
+# show the results in a data frame:
+broom::tidy(model)
+
+```
+
+
+You might recall that the interpretation of logistic regression is a bit tricky, and usually involves exponentiating coefficients and then interpreting them as the effect of a one unit change in each independent variable on the odds of the dependent variable. 
+
+An alternative method is to turn our estimates into predicted probabilities and then calculate the average effect of a one-unit change in a variable on the probability of the outcome of interest. The [marginaleffects package](https://marginaleffects.com/) has some commands that will simplify this calculation for us:
+
+
+```{r}
+# install.packages('marginaleffects')
+library(marginaleffects)
+
+comparisons<-avg_comparisons(model)
+tibble(comparisons)
+
+
+
+```
+
