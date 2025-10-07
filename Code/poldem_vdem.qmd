@@ -1,0 +1,411 @@
+---
+title: "Measuring Political Opportunit Structures"
+editor: visual
+format:
+  html:
+    df-print: paged
+    toc: true
+    toc-location: left
+    toc-depth: 4
+    smaller: true
+    self-contained: true
+    code-annotations: hover
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,
+                      root.dir='C:/Users/neilb/Documents/GVPT429K')
+
+```
+
+```{r klippy, echo=FALSE, include=TRUE}
+klippy::klippy(position = c('top', 'right'))
+```
+
+Last week we discussed the role of the political opportunity structure in shaping contentious politics. For this class, we'll look one data source that we might use to measure opportunity structures cross nationally and explore some tools we might use to explore this data in R.
+
+Keep in mind that "political opportunity structure" is a diverse and contested concept, and it can vary over time, across countries, or even in regions within countries. As a result, no single data source is going to offer a definitive measure of opportunity, and the measurement may depend on your project. This is just one example of an easily accessible source for cross-national comparisons.
+
+# V-DEM
+
+The [Varieties of Democracy (V-DEM)](https://www.v-dem.net/) project uses expert judgement to create a multidimensional measure of democracy for each country over a long time period. They also track or compile a number of additional characteristics of national-level political indicators, which can make it a good starting-point for characterizing the political opportunity structures of different countries.
+
+The V-DEM project also provides an R package that we can use to download and interact with their data set without needing to leave R-Studio. Download the [vdemdata](https://github.com/vdeminstitute/vdemdata) package. This package is hosted on Github instead of a typical package repository, so we need to use a different function to install it:
+
+```{r, eval=FALSE}
+
+install.packages("devtools")
+# now, install the vdemdata package directly from GitHub
+devtools::install_github("vdeminstitute/vdemdata")
+
+```
+
+Once the package is installed, we can import the dataset using the following line of code:
+
+```{r}
+library(tidyverse)
+vdem<-vdemdata::vdem
+
+
+```
+
+Take a moment to examine the variables included in the data and skim the [codebook](https://v-dem.net/documents/38/V-Dem_Codebook_v14.pdf) to get a sense of what the variables represent (there are a lot!). Try to identify the unit of analysis for each row of the data set.
+
+```{r}
+
+ncol(vdem)
+nrow(vdem)
+
+
+```
+
+## Creating a scatter plot
+
+V-Dem uses a multidimensional definition of democracy, so there are five different variables here that characterize different aspects of how democratic a system might be. For all four measures, the values range from 0 to 1, with 1 indicating that a state has the highest level of that characteristic, and 0 indicating the lowest level:
+
+| Variable name | Value                   |
+|---------------|-------------------------|
+| v2x_libdem    | liberal democracy       |
+| v2x_partipdem | participatory democracy |
+| v2x_polyarchy | polyarchy               |
+| v2x_delibdem  | deliberative democracy  |
+| v2x_egaldem   | egalitarian democracy   |
+
+V-DEM tracks individual countries over a long time frame, but for the sake of simplicity, we'll start by looking at democracy measures for 2019, which is the most recent year with available data for several of our variables of interest here.
+
+```{r}
+
+# filter to get only the most recent year with relevant data
+vdem_19<-vdem|>
+  filter(year == 2019)
+
+
+```
+
+We previously used `ggplot` to create line plots showing counts of events over time. For this analysis, we'll use a scatter plot to examine the relationship between liberal democracy and participatory democracy in 2019.
+
+Just like we did when we created line plots, we'll start with a call to `ggplot` along with arguments to identify the data and the variables on the X and Y axes. This will just create an empty space for our plot:
+
+```{r}
+
+
+democ_plot<-ggplot(vdem_19, 
+                   aes(x=v2x_libdem, y=v2x_partipdem)
+                   )
+
+# view the plot:
+democ_plot
+  
+
+```
+
+Then, to make a scatter plot, we'll add `geom_point` to the ggplot object:
+
+```{r}
+
+demo_scatter <- democ_plot + geom_point()
+  
+demo_scatter
+```
+
+Perhaps unsurprisingly, we can see that there's a close-but-imperfect correlation between liberal democracy and participatory democracy. We can make a couple of additional changes to our plot aesthetics to make this a little more readable:
+
+```{r}
+
+demo_scatter <-democ_plot +
+  geom_point() +
+  labs(
+    x = "Liberal democracy",
+    y = "Participatory democracy",
+    title = "Liberal vs. Participatory democracy",
+    caption = "Source: Varieties of Democracy"
+       ) +
+  theme_classic()
+
+demo_scatter
+
+```
+
+
+### Adding a line of best fit
+
+While the correlation between these two variables is obvious here, we might want to include another visual element to highlight the relationship between these two characteristics. The `geom_smooth` function will use a [loess regression](https://en.wikipedia.org/wiki/Local_regression) to draw a local line of best fit through a set of points. Unlike regular linear models, loess lines aren't necessarily straight, which makes them a useful visual tool in cases where there are non-linear relationships:
+
+```{r}
+
+demo_scatter <-democ_plot +
+  geom_point() +
+  labs(
+    x = "Liberal democracy",
+    y = "Participatory democracy",
+    title = "Liberal vs. Participatory democracy",
+    caption = "Source: Varieties of Democracy"
+       ) +
+  theme_classic() +
+  geom_smooth(se=FALSE) # se=FALSE means we don't display the standard errors
+
+demo_scatter
+
+```
+In this case, the line is almost perfectly straight and the correlation is easy to see just by looking at the scatter plot alone. So, it probably makes more sense to leave this element out of our plot. However, there might be cases where adding a line of best fit like this makes it easier to identify a relationship. 
+
+
+### Adding country labels
+
+What if I wanted to get a closer look at some specific countries on this graph? One way to make the plot a bit more informative is by adding text labels to identify the countries that correspond to each point. I can do this by adding `geom_text` and specifying a `label` aesthetic that comes from the country name variable:
+
+```{r}
+
+
+democ_plot<- ggplot(vdem_19, 
+                   aes(x=v2x_libdem, 
+                       y=v2x_partipdem, 
+                       label=country_name)
+                   )+
+  geom_point() +
+  geom_text() +
+    labs(
+    x = "Liberal democracy",
+    y = "Participatory democracy",
+    title = "Liberal vs. Participatory democracy",
+    caption = "Source: Varieties of Democracy"
+       ) +
+  theme_classic()
+
+democ_plot
+
+```
+
+... but this is not easy to read because so many of the country names are overlapping. One way to address this problem is by simply enlarging the plotting space. If I'm using a markdown document, I can do this by adjusting the `fig.height` and `fig.width` elements of my R-chunk. So it would look something like this:
+
+```{r echo=FALSE, class.output="r", comment=""}
+cat(paste(sep = "\n",
+  "```{r, fig.height=10, fig.width=10}
+  # r-code here
+  
+  ```"
+))
+```
+
+
+I can also use an R package called [ggrepel](https://cran.r-project.org/web/packages/ggrepel/vignettes/ggrepel.html) to add a limited number of text labels while minimizing overlap where possible. Once you install and load the package, you'll be able to use `geom_text_repel` in place of `geom_text` to get this result:
+
+```{r, fig.height=10, fig.width=10}
+# install.packages("ggrepel")
+library(ggrepel)
+
+democ_plot<- ggplot(vdem_19, 
+                   aes(x=v2x_libdem, 
+                       y=v2x_partipdem, 
+                       label=country_name)
+                   )+
+  geom_point() +
+  geom_text_repel() + # in place of geom_text
+    labs(
+    x = "Liberal democracy",
+    y = "Participatory democracy",
+    title = "Liberal vs. Participatory democracy",
+    caption = "Source: Varieties of Democracy"
+       ) +
+  theme_classic() +
+    geom_smooth(se=FALSE)
+
+
+democ_plot
+
+
+
+```
+
+
+Another way to do this is by using the [plotly](https://plotly.com/r/) package for R, which will provide a function (`ggplotly`) that can take a standard ggplot object and return an interactive plot that will display the "label" aesthetic whenever I hover over any point on this plot:
+
+```{r}
+# install.packages('plotly')
+library(plotly)
+
+demo_plot<-ggplot(vdem_19, 
+                   aes(x=v2x_libdem, 
+                       y=v2x_partipdem, 
+                       label=country_name)
+                   )+
+  geom_point() +
+    labs(
+    x = "Liberal democracy",
+    y = "Participatory democracy",
+    title = "Liberal vs. Participatory democracy",
+    caption = "Source: Varieties of Democracy"
+       ) 
+
+  
+ggplotly(demo_plot)
+
+
+```
+
+
+Note that these interactive plots won't retain their interactivity if you put them in a word or pdf document. So - if you plan to put them in a report to share with others - you'll need to use Rmarkdown to create an HTML file.
+
+
+### Adding more dimensions with colors and sizing
+
+What if we also wanted to consider population size in our analysis? We could do this in separate plots, but an alternative way to present an extra dimension of data would be to use the sizing of each point in our scatter plot as a rough indicator of total population. I can do this by adding a `size` argument to the aesthetics:
+
+```{r, fig.height=7, fig.width=7}
+
+
+democ_plot<- ggplot(vdem_19, 
+                   aes(x=v2x_libdem, 
+                       y=v2x_partipdem, 
+                       size = e_pop,        # sizing points based on population
+                       label=country_name)
+                   )+
+  geom_point() +
+  geom_text_repel() + # in place of geom_text
+    labs(
+    x = "Liberal democracy",
+    y = "Participatory democracy",
+    title = "Liberal vs. Participatory democracy",
+    caption = "Source: Varieties of Democracy",
+    size = 'Population'
+       ) +
+  theme_classic() 
+
+
+democ_plot
+
+```
+
+
+
+
+What if I also wanted to include information about country-level wealth? One option here might be color-coding each point based on GDP. I can do this by adding a `color` argument to the plot aesthetics. I'll also use [scale_color_virids_c](https://ggplot2.tidyverse.org/reference/scale_viridis.html) to use a different color palette for the plot:
+
+```{r,  fig.height=7, fig.width=7}
+
+democ_plot<- ggplot(vdem_19, 
+                   aes(x=v2x_libdem, 
+                       y=v2x_partipdem, 
+                       size = e_pop,        # sizing points based on population
+                       color = e_gdppc,      # color coding on gdp per capita
+                       label=country_name)
+                   )+
+  geom_point() +
+  geom_text_repel() + 
+    labs(
+    x = "Liberal democracy",
+    y = "Participatory democracy",
+    title = "Liberal vs. Participatory democracy",
+    caption = "Source: Varieties of Democracy",
+    size = 'Population',
+    color = "GDP per capita (1,000 USD)"
+       ) +
+  theme_classic() +
+  scale_color_viridis_c()
+
+democ_plot
+
+```
+
+### Using facets
+
+I could go a step further here: perhaps I want to include information about regions (`e_regionpol_6C` in the codebook). Since this variable has a relatively small number of possible values, I can use facets to re-create this same plot separately for each region.
+
+The original variable just has numeric values to indicate each region, so to make this appear properly in my plot, I'll need to create a factor variable that has labels assigned for each numeric value in `e_regionpol_6C`:
+
+
+```{r}
+
+
+vdem_19 <- vdem_19 |>
+  mutate(region = factor(
+    e_regionpol_6C,
+    levels = c(1, 2, 3, 4, 5, 6),
+    labels = c(
+      "Eastern Europe/Central Asia",
+      "Latin America/Caribbean",
+      "Middle East/North Africa",
+      "Sub-Saharan Africa",
+      "Western Europe/North America",
+      "Asia and Pacific"
+    )
+    
+  ))
+
+```
+
+
+Now, in order to perform the faceting, I'll just use `facet_wrap(~varname)` where `varname` is the name of the variable that should define each facet:
+
+```{r,  fig.height=7, fig.width=10}
+
+
+democ_plot<- ggplot(vdem_19, 
+                   aes(x=v2x_libdem, 
+                       y=v2x_partipdem, 
+                       size = e_pop,        # sizing points based on population
+                       color = e_gdppc,      # color coding on gdp per capita
+                       label=country_name)
+                   )+
+  geom_point() +
+  geom_text_repel() + # in place of geom_text
+    labs(
+    x = "Liberal democracy",
+    y = "Participatory democracy",
+    title = "Liberal vs. Participatory democracy",
+    caption = "Source: Varieties of Democracy",
+    size = 'Population',
+    color = "GDP Per capita (1,000 USD)"
+       ) +
+  theme_classic() +
+  facet_wrap(~region) +
+  scale_color_viridis_c() 
+
+democ_plot
+
+
+```
+
+Again, we can convert this to an interactive plot using `ggplotly`, then hover over a specific point to see additional information on that country:
+
+```{r,  fig.height=7, fig.width=10}
+# alas, ggplotly will ignore the geom_text_repel elements:
+ggplotly(democ_plot)
+
+```
+
+Keep in mind that there are lots of different ways to present this information, and there's no hard-and-fast rule that says "regions should be faceted and gdp should be color-coded". You'll want to experiment to decide what approach works best for your specific data source.
+
+
+
+
+
+## Visually identifying similar systems
+
+Herbert Kitschelt used a most-similar systems design to compare and contrast four anti-nuclear movements in four democracies in Europe during the 1970s. Although most similar systems design is quantitative in nature, we can still use qualitative data to perform case selection.
+
+Working with your small group, use the V-DEM codebook to identify 3-5 variables that might be used to measure "input" and "output" structures in each country in 2019 (the codebook will list the available years for each observation at the bottom of the variable description). 
+
+Make one or more plots to show how these variables relate to one another, and use the plot to identify pairs of countries that are all similar across all characteristics except for one.
+
+```{r}
+
+
+```
+
+
+## On your own
+
+
+The variable `v2cagenmob` is a variable that ranges from -4 to +4, with higher values indicating more mass mobilization in a given country-year and lower values indicating less. Use scatter plots and `geom_smooth` to summarize the relationship between mass mobilization and state repression of civil society organizations (`v2csreprss`). Briefly discuss your results.
+
+
+```{r}
+#
+
+```
+
+
+
+
+
