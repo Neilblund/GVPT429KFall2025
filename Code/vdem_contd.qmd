@@ -1,0 +1,688 @@
+---
+title: "Data Wrangling"
+editor: visual
+format:
+  html:
+    df-print: kable
+    toc: true
+    toc-location: left
+    toc-depth: 4
+    smaller: true
+    self-contained: true
+    code-annotations: hover
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+```
+
+
+We'll pick up more-or-less where we left off with the V-DEM data and discuss a couple of ways we could use it to analyze opportunity structures and contention. But first, we'll need to do a little data wrangling to get things in a proper working order.
+
+# Setup
+
+We've got three new packages that we'll use in this class, so you can go ahead and run this chunk to install those:
+
+```{r, eval=FALSE}
+
+
+install.packages("wbstats")
+install.packages('ggcorrplot')
+install.packages('countrycode')
+
+
+```
+
+
+Then run the code below to load the libraries and data:
+
+```{r}
+library(tidyverse)
+library(wbstats)
+library(countrycode)
+library(ggcorrplot)
+vdem<-vdemdata::vdem
+codebook<-vdemdata::codebook
+
+```
+
+Here's a (slightly modified) list of the variables that you all selected from the previous class, we'll use these for the example data:
+
+```{r}
+
+
+# a list of columns to use in this analysis:
+
+cols <- c(
+  'country_name',  #
+  'year',          #
+  'COWcode',       # numeric country ID
+  'e_regionpol_6C',# 6 category political/geographic region
+  'v2mecenefm',    # government censorship of media
+  'v2csreprss',    # civil society repression
+  'v2x_elecreg',   # Does the country have elections? 1 = yes, 0 = no
+  'v2eldonate',    # disclosure of campaign donations
+  'v2elvaptrn',    # % of voting age population who cast a vote 
+  'v2x_cspart',    # index of civil society participation
+  'v2cagenmob',    # mass mobilization
+  'v2csreprss',    # civil society repression
+  'v2elparlel',    # lower chamber electoral system (categorical)
+  'v2jucomp',      # index of judicial constraints on executive
+  'v2psbars',      # barriers to forming a party
+  'v2mebias',      # is there media bias against opposition parties?
+  'v2asuffrage',   # de-facto % of adults with suffrage
+  'v2elfrfair',    # would you consider this national election to be free and fair?
+  'v2clstown',     # State ownership of economy
+  'v2svstterr',    # State effective control of territory
+  'v2smgovshut',   # State shuts down internet
+  'v2psnatpar'     # unified party control of govt.
+)
+
+
+
+# get the codebook entries for the selected columns
+selected_codes<-codebook|>
+  filter(tag %in% cols)
+
+```
+
+
+
+
+## Subsetting, recoding, and filling
+
+While not an absolute necessity, we can simplify our analyses a bit by getting rid of a lot of the columns in the V-DEM data set that we won't be using. 
+
+[`select`](https://dplyr.tidyverse.org/reference/select.html) will retrieve only specific columns from a data frame. For instance, I could use this expression to retrieve the `country_name` and `year` columns:
+
+```{r}
+
+vdem|>
+  select(country_name, year)|>
+  slice_head(n=5)
+
+```
+
+There are a number of "helper" functions that we can used with select to quickly select multiple columns without having to write out the names of each one. For instance: [`all_of(x)`](https://tidyselect.r-lib.org/reference/all_of.html) would retrieve all columns that are present in the character vector "x". So the code below will give us a data frame containing only the columns from the `cols` vector we made above:
+
+```{r}
+vdem_select <- vdem |>
+  # this selects only colums in "cols"
+  select(all_of(cols)) 
+
+vdem_select|>slice_head(n=5)
+
+```
+
+### Recoding
+
+The next thing I might want to do here is re-code some of these categorical variables. There are three variables in our selections that have numeric values in the data that need to be mapped on to categorical labels: `v2elparlel`, `v2x_elecreg`, `e_regionpol_6C`:
+
+```{r}
+vdem_select|>
+  filter(year==2015)|>
+  select(country_name, year, v2elparlel, v2x_elecreg, e_regionpol_6C)|>
+  slice_head(n=5)
+
+
+```
+
+
+I'll need to consult the codebook to get a sense of what categories go with each numeric value, then I'll need to use the `factor` function to give a text label to each value. 
+
+```{r}
+
+vdem_select<-vdem_select|>
+  mutate(
+    v2elparlel = factor(
+      v2elparlel,
+      levels = c(0, 1, 2, 3),
+      labels = c("Majoritarian", "Proportional", "Mixed", "Other")
+    ), 
+    # recoding the electoral regime variable
+    v2x_elecreg = factor(
+      v2x_elecreg,
+      levels = c(0, 1),
+      labels = c("No", "Yes")
+      ), 
+    e_regionpol_6C  = factor(
+      e_regionpol_6C,
+      levels = c(1, 2, 3, 4, 5, 6), 
+      labels = c(
+        "E. Europe/Central Asia",
+        "Latin America/Caribbean",
+        "Middle East/North Africa",
+        "Sub-Saharan Africa",
+        "W. Europe/N. America",
+        "Asia and Pacific"
+      )
+    )
+   
+  )
+
+# comparing the results:
+vdem_select|>
+  filter(year==2015)|>
+  select(country_name, year, v2elparlel, v2x_elecreg, e_regionpol_6C)|>
+  slice_head(n=5)
+
+
+```
+
+### Filling and mutating
+
+Finally, you might notice that a lot of election-related variables are missing for most years in the data:
+
+```{r}
+vdem_select|>
+  filter(year>2015)|>
+  select(country_name, year, v2elvaptrn, v2elparlel)|>
+  slice_head(n=10)
+
+
+```
+
+That's because many of these variables are specific to a single election, and countries generally don't have a national election every single year. When it comes to `v2elparlel` (the lower chamber electoral system) we don't necessarily expect this to change dramatically from one election to the next. So it might make sense to just carry forward the value from the most recent election to the missing data for each subsequent year.
+
+We can do this with the [fill](https://tidyr.tidyverse.org/reference/fill.html) function, which will just take a variable name and a `.direction` argument to control how values are carried forward:
+
+```{r}
+vdem_select|>
+  filter(year>2015)|>
+  select(country_name, year,v2elparlel)|>
+  # making a copy of v2elparlel, so I can compare the results:
+  mutate(most_recent_election_type = v2elparlel)|>
+  fill(most_recent_election_type, .direction='down')|>
+  slice_head(n=10)
+  
+
+
+
+```
+
+However! I want to be careful here, because it makes sense to fill missing values this way within a single country, but it doesn't make sense to fill in Suriname's values with values from Mexico's most recent election.
+
+So, in this case, I'll want to pair `fill` with a [`group_by`](https://dplyr.tidyverse.org/reference/group_by.html) statement to ensure the filling only occurs within countries:
+
+```{r}
+vdem_select|>
+  filter(year>2015)|>
+  select(country_name, year,v2elparlel)|>
+  # making a copy of v2elparlel, so I can compare the results:
+  mutate(most_recent_election_type = v2elparlel)|>
+  # grouping the data by country
+  group_by(country_name)|>
+  # filling in election values
+  fill(most_recent_election_type, .direction='down')|>
+  # ungrouping the data
+  ungroup()|>
+  slice_head(n=10)
+  
+
+
+
+```
+
+
+I'll apply this function to the data set and assign the result to a new data frame called `vdem_filled`. 
+
+```{r}
+
+vdem_filled<-vdem_select|>
+  filter(year>2015)|>
+  # making a copy of v2elparlel, so I can compare the results:
+  mutate(most_recent_election_type = v2elparlel)|>
+  # grouping the data by country
+  group_by(country_name)|>
+  # filling in election values
+  fill(most_recent_election_type, .direction='down')|>
+  # ungrouping the data
+  ungroup()
+  
+vdem_filled|>
+  slice_head(n= 10)
+
+
+```
+
+
+We *could* apply this same "filling" process to the voter turnout measure `v2elvaptrn`, but you might notice an odd pattern here as well. The problem is probably easiest to spot if we look at a familiar example, so we'll check out the voter turnout for the US after 1945:
+
+```{r}
+vdem_select|>
+  filter(year>=1945)|>
+  filter(country_name == "United States of America")|>
+  select(country_name, year, v2elvaptrn)|>
+  drop_na()|>
+  ggplot(aes(x=year, y=v2elvaptrn, group=1)) +
+  geom_point() +
+  geom_line()
+
+```
+
+Given this clear pattern of variability across election types, we probably don't want to just "fill" the missing values from the most recent election here, because that would mean that some countries would get arbitrarily lower values depending on what kind of election they had most recently.
+
+Instead, we might want to do something like take the highest turnout in the last 10 years, or the average turnout across multiple cycles, to get a sense of each country's voter turnout patterns. Instead of using "fill" here, we could use `group_by` with [`mutate`](https://dplyr.tidyverse.org/reference/mutate.html) to calculate a maximum values within each country. 
+
+
+(Note that we already filtered `vdem_filled` to only contain values from 2015 onward. If we hadn't done this, we would get the highest turnout election in the entire history of a given country, which probably wouldn't make sense)
+
+
+```{r}
+
+vdem_filled<-vdem_filled|>
+  group_by(country_name)|>
+  mutate(highest_turnout = max(v2elvaptrn, na.rm=T))|>
+  # ungrouping the data
+  ungroup()
+
+```
+
+
+As a final step, we're going to restrict our analysis to 2023 data, which is the most recent year where these variables are available. But note that our filling and mutating has made it so that we actually have some values that have been filled down or aggregated from as early as 2015:
+
+```{r}
+vdem_latest<-vdem_filled|>
+  filter(year == 2023)
+
+
+
+
+```
+
+
+We'll finish our data cleanup by dropping `v2elvaptrn` and `v2elparlel` (since we've already made more useable copies of these variables) and then creating `vdem_no_missing` by dropping any rows that having missing or non-finite values. We want to be careful using `drop_na` because we can end up arbitrarily dropping nearly all of our data, but since we want to use all of the selected columns in a potential analysis, we're ultimately forced to get rid of some rows that don't have the information we need. Luckily, this only requires us to get rid of a handful of rows:
+
+```{r}
+vdem_no_missing<-
+  vdem_latest|>
+  select(-v2elvaptrn, -v2elparlel)|>
+  drop_na()|>
+  filter(!is.infinite(highest_turnout))
+
+nrow(vdem_no_missing)
+nrow(vdem_latest)
+
+```
+
+
+### In case you got lost
+
+Just in case you got lost in all that coding, you can click the button to see everything in one big chunk of code:
+
+```{r}
+#| code-fold: true
+
+
+
+library(tidyverse)
+library(wbstats)
+library(countrycode)
+library(ggcorrplot)
+vdem<-vdemdata::vdem
+codebook<-vdemdata::codebook
+
+cols <- c(
+  'country_name',  #
+  'year',          #
+  'COWcode',       # numeric country ID
+  'e_regionpol_6C',# 6 category political/geographic region
+  'v2mecenefm',    # government censorship of media
+  'v2csreprss',    # civil society repression
+  'v2x_elecreg',   # Does the country have elections? 1 = yes, 0 = no
+  'v2eldonate',    # disclosure of campaign donations
+  'v2elvaptrn',    # % of voting age population who cast a vote 
+  'v2x_cspart',    # index of civil society participation
+  'v2cagenmob',    # mass mobilization
+  'v2csreprss',    # civil society repression
+  'v2elparlel',    # lower chamber electoral system (categorical)
+  'v2jucomp',      # index of judicial constraints on executive
+  'v2psbars',      # barriers to forming a party
+  'v2mebias',      # is there media bias against opposition parties?
+  'v2asuffrage',   # de-facto % of adults with suffrage
+  'v2elfrfair',    # would you consider this national election to be free and fair?
+  'v2clstown',     # State ownership of economy
+  'v2svstterr',    # State effective control of territory
+  'v2smgovshut',   # State shuts down internet
+  'v2psnatpar'     # unified party control of govt.
+)
+
+vdem_select <- vdem |>
+  # this selects only colums in "cols"
+  select(all_of(cols)) 
+
+vdem_select<-vdem_select|>
+  mutate(
+    v2elparlel = factor(
+      v2elparlel,
+      levels = c(0, 1, 2, 3),
+      labels = c("Majoritarian", "Proportional", "Mixed", "Other")
+    ), 
+    # recoding the electoral regime variable
+    v2x_elecreg = factor(
+      v2x_elecreg,
+      levels = c(0, 1),
+      labels = c("No", "Yes")
+      ), 
+    e_regionpol_6C  = factor(
+      e_regionpol_6C,
+      levels = c(1, 2, 3, 4, 5, 6), 
+      labels = c(
+        "E. Europe/Central Asia",
+        "Latin America/Caribbean",
+        "Middle East/North Africa",
+        "Sub-Saharan Africa",
+        "W. Europe/N. America",
+        "Asia and Pacific"
+      )
+    )
+   
+  )
+
+
+
+vdem_filled<-vdem_select|>
+  filter(year>2015)|>
+  # making a copy of v2elparlel, so I can compare the results:
+  mutate(most_recent_election_type = v2elparlel)|>
+  # grouping the data by country
+  group_by(country_name)|>
+  # filling in election values
+  fill(most_recent_election_type, .direction='down')|>
+  # ungrouping the data
+  ungroup()
+vdem_filled<-vdem_filled|>
+  group_by(country_name)|>
+  mutate(highest_turnout = max(v2elvaptrn, na.rm=T))|>
+  # ungrouping the data
+  ungroup()
+
+
+# getting only 2023
+vdem_latest<-vdem_filled|>
+  filter(year == 2023)
+
+# getting only non-missing values
+vdem_no_missing<-
+  vdem_latest|>
+  select(-v2elvaptrn, -v2elparlel)|>
+  drop_na()|>
+  filter(!is.infinite(highest_turnout))
+
+
+```
+
+
+
+
+# Visualizing the data and selecting similar cases
+
+
+Now that you've got the data in a use-able format, we can go back to some questions from the previous class:
+
+
+## Question 1
+
+The variable `v2cagenmob` is a variable that ranges from -4 to +4, with higher values indicating more mass mobilization in a given country-year and lower values indicating less. Use scatter plots and `geom_smooth` to summarize the relationship between mass mobilization and state repression of civil society organizations (`v2csreprss`). Briefly discuss your results.
+
+
+```{r}
+# code
+
+```
+
+## Question 2
+
+
+Create some graphs that you could use to select some variables for a most similar systems design that attempts to identify why countries would have higher or lower levels of mass mobilization in 2023. For a most similar systems analysis, **you'll want to look for countries that are similar with respect to most of the predictors but have different outcomes.** So think about setting up visuals that could make it feasible to identify countries that fit these criteria.
+
+
+
+```{r}
+# Code
+
+```
+
+
+
+
+
+
+
+
+
+# Joining and countrycoding
+
+What if we want to incorporate additional information that's not available from V-DEM in our analyses? 
+
+For instance, maybe I want to include GDP per capita and total population in my analyses. While the V-DEM data does include these values, they don't appear to have them for 2023 yet, so there's not a good way to include them in my results.
+
+However, these variables *are* currently available from the World Bank for most countries, and there's another R package called [wbstats](https://cran.r-project.org/web/packages/wbstats/vignettes/wbstats.html) that we can use to easily retrieve this data:
+
+
+
+
+Once you've loaded wbstats, you can search for variables by using the [wb_search](https://cran.r-project.org/web/packages/wbstats/vignettes/wbstats.html#:~:text=Search%20available%20data%20with%20wb_search()) function.
+
+```{r}
+
+wb_search("GDP per capita")|>
+  slice_head(n=1)
+
+```
+
+Then, you can run the code below to return GDP per capita and total population for the year 2023:
+
+```{r}
+
+country_data <- wb_data(
+  indicator = c('NY.GDP.PCAP.CD', "SP.POP.TOTL"),
+  country = 'countries_only',
+  start_date = 2023,
+  end_date = 2023
+)
+
+country_data|>
+  slice_head(n=4)
+
+```
+
+
+However, we have another problem here: how do we combine the world bank data with our vdem data? To do this, we'll need to use a "[join](https://dplyr.tidyverse.org/reference/mutate-joins.html)" operation that combines "data set x" and "data set y" based on matching values in specific columns.
+
+
+Here's an example of that process using some example data from the dyplr package:
+
+```{r}
+
+# data on band members
+band_members
+
+# data on the instruments they play
+band_instruments
+
+
+```
+
+And here's how we might join those data sets using the name:
+
+```{r}
+
+# joining band members and instruments based on the name:
+full_join(x=band_members, y=band_instruments, by=join_by(name == name))
+
+
+```
+As is often the case, these two data sets don't share exactly the same set of values, and there are some subtle differences in how we might handle these mismatches:
+
+::: {.panel-tabset}
+
+### Left-join
+
+All rows in X that have matching keys in Y
+
+```{r}
+left_join(x=band_members, y=band_instruments, by=join_by(name == name))
+
+
+```
+
+### Right-join
+
+All rows in Y that have matching keys in x
+
+```{r}
+right_join(x=band_members, y=band_instruments, by=join_by(name == name))
+
+
+```
+
+
+### Inner-Join
+
+Only rows with matching keys in x and y:
+
+```{r}
+inner_join(x=band_members, y=band_instruments, by=join_by(name == name))
+
+
+```
+
+
+### Full-join
+
+All rows in x and y
+
+```{r}
+
+full_join(x=band_members, y=band_instruments, by=join_by(name == name))
+
+
+```
+
+:::
+
+For our purposes in the analysis below, it probably makes sense to use a left join that preserves all the rows in the V-DEM data and includes any matching rows from the world bank. So now we just need to identify a good join key. Intuitively, it seems like we could just do this using the country names, but the spelling of country names is often very inconsistent across different data sources. 
+
+Instead of joining these two data sets based on country names, we'll usually want to use some kind of agreed-upon country ID codes. 
+
+The V-DEM data includes the `COWcode` variable for this purpose. COWcode is a 2 or 3 digits numeric country ID that comes from the [Correlates of War ](https://correlatesofwar.org/data-sets/) project.
+
+```{r}
+vdem_no_missing|>
+  select(country_name, COWcode)|>
+  distinct()|>
+  slice_head(n=5)
+
+```
+
+The World Bank data also includes its own country IDs from the International Organization for Standardization (or ISO):
+
+```{r}
+country_data|>
+  select(country, iso3c)|>
+  slice_head(n=5)
+
+```
+
+Fortunately, there's yet another R package, [countrycode](https://cran.r-project.org/web/packages/countrycode/refman/countrycode.html), that we can use to match up different country codeing schemes. The core function is just called "[countrycode](https://cran.r-project.org/web/packages/countrycode/refman/countrycode.html#countrycode)" and we just need to give it a variable along with a code to indicate its origin and a code to indicate the "destination" or new format.
+
+In this case, we want to turn an ISO3C code into a numeric correlates of war code:
+
+```{r}
+
+country_data$COWcode<-countrycode(country_data$iso3c, 
+            origin='iso3c', 
+            destination = 'cown'
+            )
+
+
+country_data|>
+  select(country, iso3c, COWcode)|>
+  slice_head(n=5)
+
+```
+
+You'll notice some values are missing here, but this is inevitable because different sources often disagree about the precise definition of a country. 
+
+Now that we've got matching COW codes in both data sets, we can perform our join:
+
+```{r}
+
+vdem_joined<-inner_join(x=vdem_no_missing, 
+                       y=country_data, 
+                       by=join_by(COWcode == COWcode))
+
+vdem_joined|>slice_head(n=5)
+
+```
+
+
+## Question 3
+
+The code below will retrieve World Bank Data on adult life expectancy (`SP.DYN.LE00.IN`). Join this data with the V-DEM data and create a visualization to show the relationship between life expectancy and mass mobilization.
+
+```{r}
+
+life_expectancy <- wb_data(
+  'SP.DYN.LE00.IN',
+  country = 'countries_only',
+  start_date = 2023,
+  end_date = 2023
+  
+)
+
+```
+
+
+```{r}
+# code
+
+```
+
+### Extra code: creating a correlation matrix
+
+We can use correlation matrices to visualize the relationships between pairs of numeric variables. The base R function `cor` will create a correlation matrix from any data frame with only numeric columns, but the results tend to strain the eyes if you have more than a handful of variables included. 
+
+
+```{r}
+vdem_no_missing|>
+  # drop year and country code
+  select(-year, -COWcode)|>
+  # select only numeric columns
+  select(where(is.numeric))|>
+  # get the first five, just for this example:
+  select(1:5)|>
+  # get the correlation matrix:
+  cor()
+
+```
+
+Fortunately, there are several custom R packages that can help us create an easy to read visualization for a correlation matrix. We'll try using [ggcorrplot](https://cran.r-project.org/web/packages/ggcorrplot/readme/README.html) for this one.
+
+
+
+When reading the chart, note that the elements along the diagonal are all "1" because its the correlation of each variable with itself. Positive values (more red) represent positive correlations, negative values (more blue) indicate negative relationships, and values closer to 0 are weaker than values absolutely closer to -1 or +1:
+
+```{r, fig.height=10, fig.width=10}
+
+correlations<-vdem_no_missing|>
+  select(where(is.numeric))|>
+  select(-year, -COWcode)|>
+  cor()
+
+
+
+
+# creating a visual for the correlation matrix
+ggcorrplot(correlations,   
+           hc.order = TRUE,      # groups together similar variables in the plot
+           type = "full",        # shows the full square matrix
+           lab = TRUE)           # displays the actual numeric value of the correlation coefficient
+
+
+```
+
+When reading a matrix like this, two questions you can ask are: "which variables are positively or negatively correlated with the outcome of interest?" and "which variables, if any, are so strongly correlated with each other than they're basically redundant?" In some cases you might re-consider including variables that are highly correlated with each other in an analysis. Several V-DEM variables are actually aggregated indices created from combinations of other V-DEM variables, so you would definitely want to consider **not** including a variable that is already a component of another variable!
+
