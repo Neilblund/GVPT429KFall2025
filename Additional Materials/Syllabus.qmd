@@ -1,0 +1,368 @@
+---
+title: "GVPT 429K: Researching Contentious Politics"
+format: 
+  html:
+    embed-resources: true
+editor: visual
+toc: true
+toc-depth: 3
+theme: flatly
+---
+
+## Course information
+
+**Instructor:** Neil Lund **([nlund\@umd.edu](mailto:nlund@umd.edu))**
+
+**Meeting times: Tu/Th** 2:00 PM - 3:15PM
+
+**Room:** Key 0100
+
+**Office/Hours:** 1140C Tydings Hall (first floor, in the suite behind the glass doors)
+
+-   **Tue**: 11:15 AM to 1:45 PM
+
+-   **Thurs:** 11:15: AM to 1:45 PM ; 3:30 PM to 5:00 PM
+
+-   **Mon/Wed/Fri:** By appointment
+
+**Course Description**
+
+*This course will critically assess empirical research on the causes and consequences of contentious politics, with a particular focus on efforts to address these questions using quantitative methods. The phrase “contentious politics” refers to group-based behaviors such as strikes, riots, street protests, or even terrorism and rebellion where participants make contested political claims outside of institutionally approved channels like voting or lobbying. What drives people to support or oppose these efforts? When are they successful and when do they fail? And how can we make scientific sense of something as seemingly chaotic as a mass protest, much less a violent insurrection?\
+*
+
+## Learning goals
+
+By the end of the term, you should be able to:
+
+1.  Define contentious politics and identify the major motivating questions and key theories in the field.
+
+2.  Critically assess the methods and major data sources for studying contentious politics and have a sound understanding of their strengths and weaknesses.
+
+3.  Collect, clean, and analyze data on contentious politics to produce original research on a real-world instance of contentious political behavior.
+
+## Required Resources
+
+-   [ELMS page](https://umd.instructure.com/courses/1390126)
+-   A laptop with R and R-Studio installed.
+-   Assorted readings (provided through ELMS or are available [through the library proxy](https://www.lib.umd.edu/find/online/off-campus))
+
+Note that GVPT 201 is a prerequisite for this course, and I will be assuming some basic familiarity with using R, handling data, and interpreting statistical analyses. However, we will set aside class time to walk through examples of any code that will be required for this course.
+
+## Tentative Schedule
+
+This schedule is subject to change during the semester.
+
+Always consult the course modules page on ELMS for the most up-to-date links, due dates, and other time-sensitive information. Where information on ELMs conflicts will information in this document, students should assume that ELMS is correct.
+
+```{=html}
+<style type="text/css">
+.tg  {border-collapse:collapse;border-color:#ccc;border-spacing:0;}
+.tg td{background-color:#fff;border-color:#ccc;border-style:solid;border-width:1px;color:#333;
+  font-family:Arial, sans-serif;font-size:14px;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg th{background-color:#f0f0f0;border-color:#ccc;border-style:solid;border-width:1px;color:#333;
+  font-family:Arial, sans-serif;font-size:14px;font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+.tg .tg-3dm3{border-color:inherit;font-family:inherit;text-align:center;vertical-align:top}
+.tg .tg-sxqf{border-color:inherit;font-family:inherit;text-align:left;vertical-align:top}
+.tg .tg-0pky{border-color:inherit;text-align:left;vertical-align:top}
+</style>
+<table class="tg"><thead>
+  <tr>
+    <th class="tg-sxqf">Week</th>
+    <th class="tg-sxqf">ELMS Module</th>
+    <th class="tg-sxqf">Date</th>
+    <th class="tg-sxqf">Topic</th>
+    <th class="tg-sxqf">Required Readings</th>
+    <th class="tg-0pky">Data/Methods</th>
+    <th class="tg-0pky">Homework</th>
+  </tr></thead>
+<tbody>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 1</td>
+    <td class="tg-3dm3">Introductions</td>
+    <td class="tg-sxqf">9/2/2025</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="4">Theoretical   Foundations</td>
+    <td class="tg-sxqf">9/5/2025</td>
+    <td class="tg-sxqf">Strain and breakdown</td>
+    <td class="tg-sxqf">Le Bon, Gustave (1895). The crowd :   a study of the popular mind (selected chapters)</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 2</td>
+    <td class="tg-sxqf">9/8/2025</td>
+    <td class="tg-sxqf">Rational choice</td>
+    <td class="tg-sxqf">Moore, W. H. (1995). Rational   rebels: overcoming the free-rider problem. Political Research Quarterly,   48(2), 417-454.</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-sxqf">9/11/2025</td>
+    <td class="tg-sxqf">Resource mobilization theory</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">How to read a research paper</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 3</td>
+    <td class="tg-sxqf">9/16/2025</td>
+    <td class="tg-sxqf">Political process</td>
+    <td class="tg-sxqf">McAdam, D. (1999). Political process   and the development of black insurgency, 1930-1970. University of Chicago   Press. (Selected Chapters.)</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="4">Introduction to Protest Event Data</td>
+    <td class="tg-sxqf">9/19/2025</td>
+    <td class="tg-sxqf">Event data collections and news   sources</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">Introduction to Factiva/Lexis-Nexis</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 4</td>
+    <td class="tg-sxqf">9/22/2025</td>
+    <td class="tg-sxqf">Movement profile discussions</td>
+    <td class="tg-sxqf">Olzak, Susan. "Analysis of   events in the study of collective action." Annual review of sociology   15.1 (1989): 119-141.</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky">Homework 1: Protest movement profile due</td>
+  </tr>
+  <tr>
+    <td class="tg-sxqf">9/25/2025</td>
+    <td class="tg-sxqf">Dynamics of Collective Action (DOCA)   data</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">DOCA/Introduction to tidy commands   in R</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 5</td>
+    <td class="tg-sxqf">9/30/2025</td>
+    <td class="tg-sxqf">Crowd Counting Consortium (CCC)</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">Basic visualizations and tables,   working with strings and nested data</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Movement   tactics and the contentious repertoire</td>
+    <td class="tg-sxqf">10/3/2025</td>
+    <td class="tg-sxqf">Stability and change in the contentious repertoire</td>
+    <td class="tg-sxqf">Galli, A. M. (2016). How glitter   bombing lost its sparkle: The emergence and decline of a novel social   movement tactic. Mobilization: An International Quarterly, 21(3),   259-281. </td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky">Homework 2: analysis of DOCA data due</td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 6</td>
+    <td class="tg-sxqf">10/6/2025</td>
+    <td class="tg-sxqf">Tactical diffusion and movement   networks</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Governments   and opportunity structures</td>
+    <td class="tg-sxqf">10/9/2025</td>
+    <td class="tg-sxqf">Anti-nuclear movements and opportunity structures</td>
+    <td class="tg-sxqf">Kitschelt, H. P. (1986). Political   opportunity structures and political protest: Anti-nuclear movements in four   democracies. British journal of political science, 16(1), 57-85.</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 7</td>
+    <td class="tg-sxqf">10/14/2025</td>
+    <td class="tg-sxqf">Quantitative measures of regimes</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">V-DEM; Data merging and faceted   plotting</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3">Fall   Break</td>
+    <td class="tg-sxqf">10/17/2025</td>
+    <td class="tg-sxqf"> </td>
+    <td class="tg-sxqf"> </td>
+    <td class="tg-0pky"> </td>
+    <td class="tg-0pky"> </td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 8</td>
+    <td class="tg-3dm3" rowspan="2">State repression</td>
+    <td class="tg-sxqf">10/20/2025</td>
+    <td class="tg-sxqf">How repression works (or doesn’t)</td>
+    <td class="tg-sxqf">Davenport, C. (2007). State   repression and political order. Annu. Rev. Polit. Sci., 10, 1-23.</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-sxqf">10/23/2025</td>
+    <td class="tg-sxqf">Problems in measuring repression</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">Introduction to ACLED data</td>
+    <td class="tg-0pky">Homework 3: V-DEM and protest data analysis due</td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 9</td>
+    <td class="tg-3dm3" rowspan="2">Violence and   non-violence</td>
+    <td class="tg-sxqf">10/28/2025</td>
+    <td class="tg-sxqf">Violent and non-violence as strategic choices</td>
+    <td class="tg-sxqf">Chenoweth, E., &amp; Stephan, M. J.   (2011). Why civil resistance works: The strategic logic of nonviolent   conflict. Columbia University Press. (selected chapters)</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-sxqf">10/31/2025</td>
+    <td class="tg-sxqf">Non-violence and movement efficacy</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">NAVCO data and movement outcomes</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 10</td>
+    <td class="tg-3dm3" rowspan="2">Framing and identity</td>
+    <td class="tg-sxqf">11/3/2025</td>
+    <td class="tg-sxqf">Framing, identity, and social construction</td>
+    <td class="tg-sxqf">Bail, C. A. (2012). The fringe   effect: Civil society organizations and the evolution of media discourse   about Islam since the September 11th attacks. American Sociological   Review, 77(6), 855-879.</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-sxqf">11/6/2025</td>
+    <td class="tg-sxqf">Framing and text data</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">Webscraping and basic text analysis</td>
+    <td class="tg-0pky">Homework 4: ACLED analysis due</td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 11</td>
+    <td class="tg-3dm3" rowspan="2">Online contention</td>
+    <td class="tg-sxqf">11/11/2025</td>
+    <td class="tg-sxqf">Internet facilitated movements, online repertoires</td>
+    <td class="tg-sxqf">Tillery Jr, A. B. (2019). What kind   of movement is Black Lives Matter? The view from Twitter. Journal of Race,   Ethnicity, and Politics, 4(2), 297-323.</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-sxqf">11/14/2025</td>
+    <td class="tg-sxqf">Studying online protest</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">Collecting and analyzing social   media data</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 12</td>
+    <td class="tg-3dm3" rowspan="2">Transnational movements</td>
+    <td class="tg-sxqf">11/17/2025</td>
+    <td class="tg-sxqf">Trasnational opportunity structures</td>
+    <td class="tg-sxqf">Keck, M. E., &amp; Sikkink, K. A.   (2014). Activists beyond borders: Advocacy networks in international   politics. Cornell University Press. (selected chapters)</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-sxqf">11/20/2025</td>
+    <td class="tg-sxqf">Transnational movements and networks</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">Using GDELT and POLECAT</td>
+    <td class="tg-0pky">Homework 5: webscraping/social media analysis due</td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 13</td>
+    <td class="tg-3dm3">Project discussion and feedback</td>
+    <td class="tg-sxqf">11/25/2025</td>
+    <td class="tg-sxqf">-</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3">Thanksgiving recess</td>
+    <td class="tg-sxqf">11/28/2025</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 14</td>
+    <td class="tg-3dm3" rowspan="2">Cycles, waves and revolutions</td>
+    <td class="tg-sxqf">12/1/2025</td>
+    <td class="tg-sxqf">Revolutions of 1848; Arab Spring; Color Revolutions</td>
+    <td class="tg-sxqf">Ketchley, N. (2017). Egypt in a Time   of Revolution. Cambridge University Press. (selected chapters)</td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-sxqf">12/4/2025</td>
+    <td class="tg-sxqf">Temporal and spatial data</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky">Using the UCDP API/Mapping</td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-3dm3" rowspan="2">Week 15</td>
+    <td class="tg-3dm3" rowspan="2">Project presentations</td>
+    <td class="tg-sxqf">12/9/2025</td>
+    <td class="tg-sxqf">-</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+  <tr>
+    <td class="tg-sxqf">12/12/2025</td>
+    <td class="tg-sxqf">-</td>
+    <td class="tg-sxqf"></td>
+    <td class="tg-0pky"></td>
+    <td class="tg-0pky"></td>
+  </tr>
+</tbody></table>
+```
+
+## Components of the grade
+
+### Participation and engagement (10%)
+
+Attendance is a necessary, but not sufficient, condition for full credit here. Full participation means asking or answering questions, contributing to in-class discussions and exercises, offering constructive feedback on group projects etc.
+
+### Homework Assignments/Quizzes (25%)
+
+There will be homework assignments. These will primarily be used to reinforce in-class discussions on research methodology and will typically require a mixture of R programming and old-fashioned analytic skills to complete.
+
+**As needed, I may assign unscheduled quizzes on required readings. These will completed in class and are designed to be free points if you’ve completed the required readings.**
+
+### 2 Written response papers (30%)
+
+Students will select two optional readings listed on ELMS and write a short response paper that summarizes and critically assesses the analysis and main findings of each paper.
+
+### Final project/presentation (35%)
+
+Each student will conduct a brief original analysis of a topic in contentious politics. This could be a profile of a single campaign or episode, multiple social movements in a single country, the use of a tactic in multiple contexts, etc. Your analysis should use a mix of both quantitative data (a pre-existing dataset and/or primary sources you have collected yourself) and qualitative data to support your claims. Your primary goal here is description (explain what happened) but you should also offer some explanation – however tentative – that explains why those things happened. Students will present preliminary findings in the last week of class and will submit a written (8-10 page) report on the final exam date.
+
+**Late work:** [Unless you have a documented excuse](https://policies.umd.edu/student-affairs/university-of-maryland-policy-on-excused-absence) all assignments should be submitted online by the due date/time listed on ELMS. I will accept late work for partial (50%) credit provided it is turned in within 1 week of the due date.
+
+# Additional guidelines
+
+## Names/Pronouns and Self-Identifications:
+
+The University of Maryland recognizes the importance of a diverse student body, and we are committed to fostering inclusive and equitable classroom environments. I invite you, if you wish, to tell us how you want to be referred to in this class, both in terms of your name and your pronouns (he/him, she/her, they/them, etc.). Keep in mind that the pronouns someone uses are not necessarily indicative of their gender identity. Visit trans.umd.edu to learn more.
+
+Additionally, it is your choice whether to disclose how you identify in terms of your gender, race, class, sexuality, religion, and dis/ability, among all aspects of your identity (e.g., should it come up in classroom conversation about our experiences and perspectives) and should be self-identified, not presumed or imposed. I will do my best to address and refer to all students accordingly, and I ask you to do the same for all of your fellow Terps.
+
+## Resources & Accommodations
+
+### Accessibility and Disability Services
+
+The University of Maryland is committed to creating and maintaining a welcoming and inclusive educational, working, and living environment for people of all abilities. The University of Maryland is also committed to the principle that no qualified individual with a disability shall, on the basis of disability, be excluded from participation in or be denied the benefits of the services, programs, or activities of the University, or be subjected to discrimination. The Accessibility & Disability Service (ADS) provides reasonable accommodations to qualified individuals to provide equal access to services, programs and activities. ADS cannot assist retroactively, so it is generally best to request accommodations several weeks before the semester begins or as soon as a disability becomes known. Any student who needs accommodations should contact me as soon as possible so that I have sufficient time to make arrangements. For assistance in obtaining an accommodation, contact Accessibility and Disability Service at 301-314-7682, or email them at adsfrontdesk\@umd.edu. Information about sharing your accommodations with instructors, note taking assistance and more is available from the Counseling Center.
+
+### Student Resources and Services
+
+Taking personal responsibility for your own learning means acknowledging when your performance does not match your goals and doing something about it. I hope you will come talk to me so that I can help you find the right approach to success in this course, and I encourage you to visit UMD’s Student Academic Support Services website to learn more about the wide range of campus resources available to you. In particular, everyone can use some help sharpening their communication skills (and improving their grade) by visiting UMD’s Writing Center and schedule an appointment with the campus Writing Center. You should also know there are a wide range of resources to support you with whatever you might need (UMD’s Student Resources and Services website may help). If you feel it would be helpful to have someone to talk to, visit UMD’s Counseling Center or one of the many other mental health resources on campus.
+
+### Notice of Mandatory Reporting
+
+Notice of mandatory reporting of sexual assault, sexual harassment, interpersonal violence, and stalking: As a faculty member, I am designated as a “Responsible University Employee,” and I must report all disclosures of sexual assault, sexual harassment, interpersonal violence, and stalking to UMD’s Title IX Coordinator per University Policy on Sexual Harassment and Other Sexual Misconduct. If you wish to speak with someone confidentially, please contact one of UMD’s confidential resources, such as CARE to Stop Violence (located on the Ground Floor of the Health Center) at 301-741-3442 or the Counseling Center (located at the Shoemaker Building) at 301-314-7651. You may also seek assistance or supportive measures from UMD’s Title IX Coordinator, Angela Nastase, by calling 301-405-1142, or emailing titleIXcoordinator\@umd.edu. To view further information on the above, please visit the Office of Civil Rights and Sexual Misconduct's website at ocrsm.umd.edu.
+
+### Basic Needs Security
+
+If you have difficulty affording groceries or accessing sufficient food to eat every day, or lack a safe and stable place to live, please visit UMD’s Division of Student Affairs website for information about resources the campus offers you and let me know if I can help in any way. \### Veteran Resources UMD provides some additional supports to our student veterans. You can access those resources at the office of Veteran Student life and the Counseling Center. Veterans and active duty military personnel with special circumstances (e.g., upcoming deployments, drill requirements, disabilities) are welcome and encouraged to communicate these, in advance if possible, to the instructor.
