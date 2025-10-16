@@ -28,7 +28,6 @@ theme_set(theme_minimal(base_family = "opensans"))
 
 ```
 
-
 ```{=css}
 
 div:has(> blockquote) {
@@ -49,75 +48,56 @@ blockquote p::after {
 blockquote + p {
   text-align: right;
 }
-
 ```
+## Repression
 
-
-## Repression 
-
-::::: {.columns}
-::: {.column width="50%"}
+::::::: columns
+:::: {.column width="50%"}
 <div>
-  <blockquote cite="https://www.huxley.net/bnw/four.html">
-    <p>
-... actual or threatened use of physical sanctions against an individual
-or organization, within the territorial jurisdiction of the state, for the
-purpose of imposing a cost on the target as well as deterring specific
-activities and/or beliefs perceived to be challenging to government
-personnel, practices or institutions
 
-  </p>
-  </blockquote>
-  <p>— Christian Davenport<cite> "State Repression and Political Order"</cite></p>
+<blockquote cite="https://www.huxley.net/bnw/four.html">
+
+<p>... actual or threatened use of physical sanctions against an individual or organization, within the territorial jurisdiction of the state, for the purpose of imposing a cost on the target as well as deterring specific activities and/or beliefs perceived to be challenging to government personnel, practices or institutions</p>
+
+</blockquote>
+
+<p>— Christian Davenport<cite> "State Repression and Political Order"</cite></p>
+
 </div>
+::::
 
-
-:::
-::: {.column width="50%"}
-
-
+:::: {.column width="50%"}
 Repressive tactics:
 
 ::: incremental
+-   Violations of 1A-type rights
 
+-   Surveillance
 
-- Violations of 1A-type rights
+-   Detention
 
-- Surveillance
-
-- Detention
-
-- Torture and mass killing
-
-
+-   Torture and mass killing
 :::
-
-:::
-:::::
-
+::::
+:::::::
 
 ## How repression works: sheer attrition
 
-::::: {.columns}
+::::: columns
 ::: {.column width="50%"}
+-   Arresting/killing/disabling supporters and potential supporters
 
-- Arresting/killing/disabling supporters and potential supporters
+-   Targeted removal
 
-- Targeted removal
-
-- Targeting donors, freezing bank accounts, sanctions
-
-
+-   Targeting donors, freezing bank accounts, sanctions
 :::
+
 ::: {.column width="50%"}
-
 ![Military troops guarding anti-war protesters in a makeshift prison in RFK stadium (1971)](images/mass_arrests.webp)
-
-
 :::
 :::::
 
-::: {.notes}
+::: notes
 At the most basic level: if you put enough people out of commission, its not feasible for them to continue protesting. This is obviously resource intensive, but states do it: example of the 1971 mass detention of anti-war activists in RFK stadium and the Chinese govt's use of mass pre-emptive detention of Tibetan activsts around anniversaries of protest events.
 
 Losing leadership or certain skilled activists can cripple groups. Guerrilla organizations don't have an endless supply of bomb-makers, bureaucrats, or charismatic ideologues
@@ -125,307 +105,217 @@ Losing leadership or certain skilled activists can cripple groups. Guerrilla org
 External supporters can be easy to coerce - especially because they tend to have less direct investment in the cause and may be more invested in protecting their reputations.
 :::
 
-
 ## How repression works: costs and deterrence
 
-
-
-::::: {.columns}
+::::: columns
 ::: {.column width="50%"}
+-   Fear of arrest or other physical, social, or financial penalties.
 
-- Fear of arrest or other physical, social, or financial penalties.
-
-- Raising the expectation that others will free ride
-
-
-
+-   Raising the expectation that others will free ride
 :::
+
 ::: {.column width="50%"}
 ![Protester disabling a surveillance camera in Hong Kong](images/hongkong_smartcam.webp)
-
-
 :::
 :::::
 
-
-::: {.notes}
-
+::: notes
 Recall that the rat choice model for protests suggests that participants would be very cost sensitive. So this is a major pain point, especially for movements that rely on low levels of investment.
 
 Moreover, the risks can feed expectations that others would free ride - which lowers expectations of success and raises fears of being targeted (no one wants to be the lone rebel)
-
 :::
-
 
 ## How repression works: disunity
 
-
-
-::::: {.columns}
+::::: columns
 ::: {.column width="50%"}
+-   Infiltration, spying and coerced cooperation
 
-- Infiltration, spying and coerced cooperation
-
-- Conflicts over tactics and leadership
-
-
+-   Conflicts over tactics and leadership
 :::
+
 ::: {.column width="50%"}
-
 ![Irish Republican Army poster (circa 1970)](images/ira_distrust.webp)
-
 :::
 :::::
 
-
-::: {.notes}
-
+::: notes
 Direct impacts come through things like suspicions about spying and double agents.
 
 State forces sometimes deliberately play up this dynamic: the FBI's COINTELPRO operations against leftist movements had agents infiltrate groups to sow internal dissent.
 
 Harsh repression also exacerbates tactical disputes: "should we moderate or use violence? should become more open or turn inward?" drive factionalism.
-
 :::
-
 
 ## How repression works: morale and expectations of the future
 
-
-
-::::: {.columns}
+::::: columns
 ::: {.column width="50%"}
+-   Signalling that the government is strong
 
-- Signalling that the government is strong
-
-- Difficulty gauging public support
-
-
+-   Difficulty gauging public support
 :::
+
 ::: {.column width="50%"}
-
 ![Police attacking environmental activists in Germany](images/police_image.png)
-
 :::
 :::::
 
-
-
-
-
-::: {.notes}
-
-
+::: notes
 Signal state strength and movement weakness. Undermine the emergence of "cognitive liberation" necessary for social movements: participants must believe problems are amenable to change.
 
-Repression also makes it difficult to gauge public support for regime change because people are afraid to openly voice dissent. Thus, even where supermajorities might be willing to participate in collective action, unaware that the opportunity to do so exists. 
-
-
+Repression also makes it difficult to gauge public support for regime change because people are afraid to openly voice dissent. Thus, even where supermajorities might be willing to participate in collective action, unaware that the opportunity to do so exists.
 :::
-
-
-
 
 ## Repression and dissent
 
 But does repression work? ... It depends!
 
-
 <div>
-  <blockquote cite="https://www.huxley.net/bnw/four.html">
-    <p>
-... Scholars have theorized that all possible curves fit the impact of repression and dissent
 
-  </p>
-  </blockquote>
-  <p>— Mark Lichbach<cite></cite></p>
+<blockquote cite="https://www.huxley.net/bnw/four.html">
+
+<p>... Scholars have theorized that all possible curves fit the impact of repression and dissent</p>
+
+</blockquote>
+
+<p>— Mark Lichbach<cite></cite></p>
+
 </div>
 
-::: {.notes}
+::: notes
+-   Studies of the "repression-dissent nexus" have found evidence for every conceivable relationship: U-shaped, inverted U, positive, negative, and null
 
-- Studies of the "repression-dissent nexus" have found evidence for every conceivable relationship: U-shaped, inverted U, positive, negative, and null
-
-- The upshot of this research program is that there really isn't a single effect - there are multiple conditional relationships.
-
-
+-   The upshot of this research program is that there really isn't a single effect - there are multiple conditional relationships.
 :::
-
-
-
-
-
 
 ## Repression decreasing dissent
 
-::::: {.columns}
+::::: columns
 ::: {.column width="50%"}
+-   Extensive repression of Ogoni activists in Nigeria, culminating in the execution of protest leader Ken Saro-Wiwa in 1995.
 
-- Extensive repression of Ogoni activists in Nigeria, culminating in the execution of protest leader Ken Saro-Wiwa in 1995.
-
-- Ogoni movement demobilized (even after democratization in 1999)
-
-
+-   Ogoni movement demobilized (even after democratization in 1999)
 :::
+
 ::: {.column width="50%"}
-
-![Ogoni Activist Ken Saro-Wiwa](images/Ken Saro-Wiwa.jpg)
-
-
-
+![Ogoni Activist Ken Saro-Wiwa](images/Ken%20Saro-Wiwa.jpg){width="60%"}
 :::
 :::::
 
-::: {.notes} 
+::: notes
+-   Example from Bob, C., & Nepstad, S. E. (2007). Kill a leader, murder a movement? Leadership and assassination in social movements. American Behavioral Scientist, 50(10), 1370-1394.
 
-- Example from Bob, C., & Nepstad, S. E. (2007). Kill a leader, murder a movement? Leadership and assassination in social movements. American Behavioral Scientist, 50(10), 1370-1394.
+-   The Ogoni are an ethnic minority (\~500,000 in a country of over 200 million) that primarily lives in near the Niger Delta in southern Nigeria.
 
-- The Ogoni are an ethnic minority (~500,000 in a country of over 200 million) that primarily lives in near the Niger Delta in southern Nigeria. 
+-   Shell oil started extensive commercial oil extraction in the region in the late 50s. This resulted in extensive environmental damage (2.1 million barrels of oil spilled in Ogoniland) with very little financial upside for the region.
 
-- Shell oil started extensive commercial oil extraction in the region in the late 50s. This resulted in extensive environmental damage (2.1 million barrels of oil spilled in Ogoniland) with very little financial upside for the region.
+-   Ken Saro-Wiwa's MOSOP (movement for the survival of Ogoni people) led a campaign of non-violent resistance designed to disrupt oil production in the country unless leaders agreed to a plan of regional autonomy and limits on drilling. The effort drew international support and culminated in Shell's withdrawal from the region in 1993.
 
-- Ken Saro-Wiwa's MOSOP (movement for the survival of Ogoni people) led a campaign of non-violent resistance designed to disrupt oil production in the country unless leaders agreed to a plan of regional autonomy and limits on drilling. The effort drew international support and culminated in Shell's withdrawal from the region in 1993. 
+-   The Nigerian gov declared disruptions to oil "treasonous" and initiated a campaign of violent repression against the Ogoni.
 
-- The Nigerian gov declared disruptions to oil "treasonous" and initiated a campaign of violent repression against the Ogoni.
-
-- Saro-Wiwa (and 9 other leaders) were arrested in 1994 and executed in a military trial; this was followed by severe repression of any subsequent protests.
-
+-   Saro-Wiwa (and 9 other leaders) were arrested in 1994 and executed in a military trial; this was followed by severe repression of any subsequent protests.
 :::
-
 
 ## Repression increasing dissent
 
-::::: {.columns}
+::::: columns
 ::: {.column width="50%"}
-
-![El Salvadoran Archbishop Oscar Romero](images/Monseñor_Romero.jpg)
-
-
+![El Salvadoran Archbishop Oscar Romero](images/Monseñor_Romero.jpg){width="60%"}
 :::
+
 ::: {.column width="50%"}
+-   Violent repression of left-wing movements in El Salvador in the 70s. The Archbishop and activist Oscar Romero killed during a Mass in 1980
 
-- Violent repression of left-wing movements in El Salvador in the 70s. The Archbishop and activist Oscar Romero killed during a Mass in 1980
-
-- 8 months later: guerrilla groups unify to found the FMLN and conflict moves into full-blown civil war.
-
+-   8 months later: guerrilla groups unify to found the FMLN and conflict moves into full-blown civil war.
 :::
 :::::
 
-::: {.notes} 
+::: notes
+-   Salvadoran government overthrown in a military coup in 1979.
 
-- Salvadoran government overthrown in a military coup in 1979. 
+-   Protests over extreme inequality and authoritarianism by a bunch of left wing groups - broadly referred to under as the liberation movement. Government response was a campaign of violence and forced displacement mostly targeting the countryside.
 
-- Protests over extreme inequality and authoritarianism by a bunch of left wing groups - broadly referred to under as the liberation movement. Government response was a campaign of violence and forced displacement mostly targeting the countryside.
+-   Romero (initially a conservative) emerged as a unifying figurehead for an array of pro-democracy, land reform, peasant's rights, and other leftist groups in El Salvador
 
-- Romero (initially a conservative) emerged as a unifying figurehead for an array of pro-democracy, land reform, peasant's rights, and other leftist groups in El Salvador
+-   Assassination weakened the reformist/non-violent wings of the liberation movement and had a unifying effect on guerrilla groups
 
-- Assassination weakened the reformist/non-violent wings of the liberation movement and had a unifying effect on guerrilla groups
-
-- International response also heightened: El Salvadoran solidarity groups emerged and attempted to pressure the U.S. gov to drop support for Salvadoran government.
-
+-   International response also heightened: El Salvadoran solidarity groups emerged and attempted to pressure the U.S. gov to drop support for Salvadoran government.
 :::
-
 
 ## Conditional effects of repression
 
-- Intuitively, repression should decrease dissent, but sometimes it fails.
+-   Intuitively, repression should decrease dissent, but sometimes it fails.
 
-- So why does repression fail?
+-   So why does repression fail?
 
-::: {.notes}
-
-
+::: notes
 There's no single explanation here, but its clear that the repression dissent relationship is conditional - what it does depends on things like timing and execution - and so analyses of repression have to be dis-aggregated in order to understand how they work.
-
 :::
 
 ### A caution about counterfactuals
 
-
 ::: incremental
+-   Underwhelming but plausible explanation: repressed movements would have succeeded regardless.
 
-- Underwhelming but plausible explanation: repressed movements would have succeeded regardless.
+-   Difficult to entirely rule out because:
 
-- Difficult to entirely rule out because:
-  - We don't have true counterfactuals 
-  - Repression/Dissent are mutual causes.
-  
-  
+    -   We don't have true counterfactuals
+    -   Repression/Dissent are mutual causes.
 :::
 
-
-::: {.notes}
-
+::: notes
 Counterfactuals/fundamental problem of causal inference: causal claims imply that we know what would happen "if not X". In other words: if I say repression caused radicalization in El Salvador, it implies that there would not have been radicalization if not for the state repression - but we never observe this. (We'll return to this problem when we discuss protest outcomes, but its a fundamental problem that requires us to seek out imperfect comparisons.)
 
 We do have some reason to suspect this isn't the entire story: because even when we attempt to hold constant for things like "level of movement support" there are differing outcomes.
-
-
-
-
 :::
 
 ### Substitution effects
 
-Repression incentivizes a new mixture of tactics^[See: @lichbach1987deterrence]
+Repression incentivizes a new mixture of tactics[^1]
+
+[^1]: See: @lichbach1987deterrence
 
 ::: incremental
+-   Opposition want to maintain a constant level of "pressure" by selecting an optimum mixture of violent and non-violent tactics.
 
-- Opposition want to maintain a constant level of "pressure" by selecting an optimum mixture of violent and non-violent tactics.
+-   If states raise the costs of using the more efficient tactic, then opposition groups will sometimes compensate by using more of a relatively less efficient tactic.
 
-- If states raise the costs of using the more efficient tactic, then opposition groups will sometimes compensate by using more of a relatively less efficient tactic.
-
-- In some circumstances, raising the costs of a tactic might lead to more use of the tactic itself.^[@heath2000calculus]
-
-
+-   In some circumstances, raising the costs of a tactic might lead to more use of the tactic itself.[^2]
 :::
 
+[^2]: @heath2000calculus
 
-::: {.notes}
- 
-- One model, rooted in rational choice perspective, argues that the use of repression will drive groups to seek out substitutes, which may be less efficient (and thus require more activity) to pull off.
-  - Note that states really do repress non-violence in many cases: examples are cases like the South African ban on the ANC in 1960 which drove activists to adopt a campaign of sabotage. 
-
-
-
-
+::: notes
+-   One model, rooted in rational choice perspective, argues that the use of repression will drive groups to seek out substitutes, which may be less efficient (and thus require more activity) to pull off.
+    -   Note that states really do repress non-violence in many cases: examples are cases like the South African ban on the ANC in 1960 which drove activists to adopt a campaign of sabotage.
 :::
-
 
 ### Public opinion and targeting
 
 Repression also has costs for governments, and those costs are variable.
 
-::::: {.columns}
-::: {.column width="50%"}
-
+::::::: columns
+:::: {.column width="50%"}
 ::: incremental
+-   Public support/opposition for repression depends on both protesters and govt tactics.
 
-- Public support/opposition for repression depends on both protesters and govt tactics. 
+-   Violent repression of non-violent movements is particularly likely to elicit greater public opposition.
 
-- Violent repression of non-violent movements is particularly likely to elicit greater public opposition.
-
-- Repression of "out-groups" is more likely to be supported than repression of in-groups.^[@edwards2021violence]
-
+-   Repression of "out-groups" is more likely to be supported than repression of in-groups.[^3]
 :::
+::::
 
-
-:::
-::: {.column width="50%"}
-
-
-
-:::fragment
-
+:::: {.column width="50%"}
+::: fragment
 ![@lupu2019violence](images/lupu_violent_repression.png)
-
 :::
+::::
+:::::::
 
-:::
-:::::
+[^3]: @edwards2021violence
 
-::: {.notes}
-
-
+::: notes
 :::
 
 ### Micromobilization
@@ -433,99 +323,66 @@ Repression also has costs for governments, and those costs are variable.
 Repression raises costs but triggers micromobilization processes that encourage more protest. For instance:
 
 ::: incremental
-
-- Being arrested for protest might shut you out of non-protest social circles
-- Martyrdom and prestige among activists
-- Increasing the expectation that "important others" will participate
-
+-   Being arrested for protest might shut you out of non-protest social circles
+-   Martyrdom and prestige among activists
+-   Increasing the expectation that "important others" will participate
 :::
 
-::: {.notes}
-
+::: notes
 In the same way that repression can increase costs it can also create new benefits, or lower the perception of risks:
 
-- It undermines faith/legitimacy of the government. 
+-   It undermines faith/legitimacy of the government.
 
-- which raises benefits of reform and also raises expectations that others will join up (note that knowing whether others are mad is typically a big impediment to protest under autocracy)
+-   which raises benefits of reform and also raises expectations that others will join up (note that knowing whether others are mad is typically a big impediment to protest under autocracy)
 
-- Moral/social obligation: why should I let others suffer on my behalf? How will I be seen if I fail to stand up?
-
-
+-   Moral/social obligation: why should I let others suffer on my behalf? How will I be seen if I fail to stand up?
 :::
-
 
 ### Micromobilization and social networks
 
-::::: {.columns}
+::::: columns
 ::: {.column width="50%"}
-
-- One implication: these effects depend on whether you're already embedded in a network of protest supporters.
-
+-   One implication: these effects depend on whether you're already embedded in a network of protest supporters.
 :::
 
 ::: {.column width="50%"}
-
 ![@opp1990repression](images/opp_networks.png)
-
-
 :::
 :::::
 
 ### Micromobilization and timing
 
-
-::::: {.columns}
+::::: columns
 ::: {.column width="50%"}
+-   Costs are immediate, but micromobilization takes time
 
-- Costs are immediate, but micromobilization takes time
-
-- So: repression will have short term negative effects but long term positive effects.
-
-
+-   So: repression will have short term negative effects but long term positive effects.
 :::
+
 ::: {.column width="50%"}
-
 ![@rasler1996concessions](images/rasler_iran.png)
-
 :::
 :::::
 
-::: {.notes}
-
-
+::: notes
 :::
-
-
 
 ### Indiscriminate repression
 
-
-
-::::: {.columns}
+:::::: columns
 ::: {.column width="50%"}
-
-- *Indiscriminate* repression doesn't actually change the relative costs of protesting, but it can increase the perceived benefits of regime change (targeted repression is hard, especially for weak states!)
-
+-   *Indiscriminate* repression doesn't actually change the relative costs of protesting, but it can increase the perceived benefits of regime change (targeted repression is hard, especially for weak states!)
 :::
-::: {.column width="50%"}
 
+:::: {.column width="50%"}
 ::: fragment
 ![@demirel2021effects](images/gezi_regression.png)
-
 :::
+::::
+::::::
 
+::: notes
 :::
-:::::
-
-
-::: {.notes}
-
-
-:::
-
-
-
-
 
 ```{r}
 #| fig-align: center
@@ -572,11 +429,7 @@ plt<-df|>
 
 ```
 
-
-
 ### References
 
 ::: {#refs}
 :::
-
-
