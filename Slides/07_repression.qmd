@@ -4,6 +4,7 @@ bibliography: references.bib
 format:
   revealjs:
     theme: [solarized, clean]
+    smaller: true
     df-print: paged
     slide-number: true
     header: 
