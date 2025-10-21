@@ -88,7 +88,7 @@ The code below will return data on events in China since 2018. The `population` 
 
 Note that I could also filter events by `event_type`, `country`, or `inter_code` (numeric interaction code):
 
-```{r, eval=FALSE, echo=FALSE}
+```{r, eval=FALSE, echo=TRUE}
 
 library(acledR)
 library(tidyverse)
@@ -101,6 +101,15 @@ result<-acled_api(
   end_date = '2024-10-01',
   country = 'China')
 
+
+
+```
+
+If you're not able to get this working yet, you can download the data by running this code:
+
+```{r}
+
+result<-read_csv('https://raw.githubusercontent.com/Neilblund/GVPT429KFall2025/refs/heads/main/Code/acled_china_2018_2024.csv')
 
 
 ```
