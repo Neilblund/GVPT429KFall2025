@@ -1,0 +1,348 @@
+---
+title: "ACLED"
+editor: visual
+format:
+  html:
+    df-print: paged
+    toc: true
+    toc-location: left
+    toc-depth: 4
+    smaller: true
+    self-contained: true
+    code-annotations: hover
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+library(tidyverse)
+library(acledR)
+
+
+
+
+
+```
+
+
+
+In a previous class, we talked about using sources like V-DEM to get country-level measures of things like state repression, democratic institutions, and other aspects of the political opportunity structure. In this class, we'll explore a data source that measures state repression at the event level rather than the country-year level.
+
+Armed Conflict Location & Event Data (ACLED) is a project that records both violent and non-violent conflict events and "strategic developments" around the world. The project initially collected data on Africa and the Middle east, but, since 2021, they have expanded their scope to include the entire globe. 
+
+They update their data every two weeks, however, their most accessible data sets are now released with a one year lag.
+
+
+
+## Installing a couple packages
+
+Install the packages below by removing the `#` and executing each line of code. 
+
+```{r}
+# install.packages("usethis")
+# install.packages("acledR")
+# install.packages('zoo')
+```
+
+
+## Signing up for an ACLED account
+
+Head over to [the ACLED website](https://acleddata.com/user/register) and follow the instructions to register an account. For now, copy-paste your password and email address into a text file so you can use it later. Be sure to use your `.umd` email address and select "academic" as your affiliation to ensure you get the highest level of free access.
+
+
+## Storing your login info
+
+We'll be using the `acledR` package to interact with the data from within R. To use the commands from this package, you'll need to send your password and email address as arguments. You *could* do this by just copying those values directly into a script, but that's a bad way to store private information.
+
+To get around this problem, we'll assign the password and email addresses as environment variables that we can access in R using the function `Sys.getenv`
+
+
+To set this up, run this line to open the `.Renviron` file in a new window in R-studio:
+
+```{r, eval=FALSE, echo=TRUE}
+
+usethis::edit_r_environ()
+
+```
+
+
+You'll want to create two new lines in this file: one with the email address you used to register, and another with your ACLED password. The password and email address should both be enclosed in quotation marks. Here's an example of how that might look:
+
+![](images/renviron_edits.png)
+
+ 
+When you're finished, be sure you **save the changes to your your `.Renviron` file**. Then, you'll need to restart R-studio. If you've set this up correctly, running `Sys.getenv('acled_email')` in your console should return the email address you just used to sign up.
+
+```{r}
+Sys.getenv('acled_email')
+
+```
+
+
+## Sending a query
+
+Now that we've got our password and username set up as environment variables, we can send a query using the [`acledR`](https://dtacled.github.io/acledR/) package.
+
+
+The code below will return data on events in China since 2018. The `population` argument will also return an estimate of the population that was "exposed" to each event. 
+
+Note that I could also filter events by `event_type`, `country`, or `inter_code` (numeric interaction code):
+
+```{r, eval=FALSE, echo=FALSE}
+
+library(acledR)
+library(tidyverse)
+
+result<-acled_api(
+  email = Sys.getenv('acled_email'),
+  password = Sys.getenv('acled_password'),
+  population ='best',
+  start_date = '2018-01-01',
+  end_date = '2024-10-01',
+  country = 'China')
+
+
+
+```
+
+
+If you're planning to use data from ACLED for an analysis, I would recommend saving your results so you can avoid the need to send the same query over and over:
+
+```{r, eval=FALSE}
+write_csv(result, file='acled_china_2018_2024.csv')
+
+```
+
+Now that you have a saved file, you can read data back into R with the `read_csv` function:
+
+```{r}
+result<-read_csv('acled_china_2018_2024.csv')
+
+```
+
+
+## Using the data
+
+ACLED codes up to 31 different characteristics of each event. You can read additional details about these event characteristics on [their website](https://acleddata.com/methodology/acled-codebook).The list is quite expansive, and we'll often need to use these variables to filter data to identify the information we're interested in for an analysis.
+
+
+
+
+
+### Event types, interaction types, and geography
+
+Where possible, ACLED records the locations of each event. Sometimes this isn't very specific: some sources may only report a country or administrative region for a protest, but in other cases, news reports will indicate a specific city or even a specific street when discussing an event. You can get a sense for the level of specificity for a location by looking at the `geo_precision` column for an event:
+
+
+```{r}
+
+table(result$geo_precision)
+
+
+```
+
+I'm going to use the `admin1` variable, which records the general administrative region for each event, to identify events that took place in Hong Kong only. I'll just use `filter` to get a set of events:
+
+```{r}
+
+hk<-result|>
+  filter(admin1 == "Hong Kong")
+
+```
+
+
+Note that there is a complex typology of event types represented here. You can read more about the event typology [here](https://acleddata.com/methodology/acled-codebook#acled-events-2). The most unusual class of events are "Strategic developments". These includes things like states gaining or losing territory, or declarations of states of emergency, or targeted assassinations. ACLED includes some addition detail on how these work [on their website](https://acleddata.com/methodology/strategic-developments-acled-dataset), but for our purposes, we're just going to put them in a separate data set entirely.
+
+```{r}
+
+strategic_developments<-hk|>
+  filter(event_type == "Strategic developments")
+
+hk_events<-hk|>
+    filter(event_type !='Strategic developments')
+
+
+```
+
+
+Finally, I'll use counts of the `interactions` column to get counts of the groups that interacted with each other in Hong Kong:
+
+```{r}
+
+
+
+interaction<-hk_events|>
+  count(interaction)
+
+
+ggplot(interaction, aes(x=reorder(interaction, n), y=n)) + 
+  geom_bar(stat='identity')  +
+  coord_flip() +
+  theme_bw() +
+  labs(y='Number of events',
+       x ='Interaction type'
+       )
+
+
+```
+
+#### On your own
+
+Use the `sub_event_type` column to get a bar graph with counts of the following types of activity: violent demonstrations, excessive force against protesters, protest with intervention, and peaceful protests.
+
+
+```{r}
+# your code
+
+```
+
+
+### Searching for a specific type of event
+
+In many cases, we'll want to filter results to include a specific type of event. For instance, I might be interested in identifying protests related to the corona virus outbreak. Although ACLED doesn't explicitly categorize protests this way, they do include a "notes" column that has a brief summary of each event.
+
+In many cases, I can filter data based on the contents of the notes column. However, because this is free text, I can't just do something like `filter(notes == "covid")`, instead, I'll use a [regular expression](https://en.wikipedia.org/wiki/Regular_expression), which is a language that can be used to match specific patterns in text. 
+
+Regular expressions are extremely flexible, and we can use them to identify some really complex patterns. In this case, however, we can use a relatively simple RegEx to capture our data: we basically just want events where the notes column contains words like "coronavirus" or "covid-19". 
+
+The [`str_detect`](https://stringr.tidyverse.org/reference/str_detect.html) function will take a column and a regular expression and will return `TRUE` for any elements of the column where there is a matching pattern:
+
+```{r}
+string = c("A sentence containing covid",
+           "A sentence that shouldn't be matched"
+           )
+
+str_detect(string, "covid")
+
+```
+
+So, we can use `str_detect` to extract rows where the `notes` column contains the string "covid":
+
+```{r}
+
+result|>
+  filter(str_detect(notes,  "covid"))|>
+  nrow()
+
+
+
+
+```
+
+
+This doesn't return any data, however because our expression is case-sensitive. If I wanted to capture instances where covid occurred in lower case OR upper case, I could use a slightly modified version of this expression. Using the square brackets `[]`, I can define a "character set" where the expression will evaluate to TRUE if any single character in the set is match. So the code below matches EITHER "Covid" or "covid":
+
+```{r}
+result|>
+  filter(str_detect(notes,  "[cC]ovid"))|>
+  nrow()
+
+
+```
+This is still too low! That sort of makes sense, because there's more than one name for Covid 19. I can extend my regular expression further by using the pipe operator ("`|`") which works like a logical OR operator. So the code below will match EITHER covid, Covid, corona, or Corona:
+
+```{r}
+result|>
+  filter(str_detect(notes,  "[cC]ovid|[Cc]orona"))|>
+  nrow()
+
+```
+That gets us a far more plausible result.
+
+
+
+
+
+```{r}
+c19<-result|>
+  filter(str_detect(notes,  "[cC]ovid|[Cc]orona"))
+
+
+
+```
+
+
+
+
+### Making an event timeline
+
+We'll use our results to create a timeline of Covid-related protests and riots in China between 2018 through 2024.
+
+
+To do this, we'll start by using the familiar `filter` and `count` functions to create a data frame with a number of protests or riots per day:
+
+```{r}
+
+
+
+events_count<-c19|>
+  filter(event_type%in% c("Protests", "Riots"))|>
+  count(event_date,event_type)
+
+```
+
+Next, we'll need to use the `complete` function to fill in zeros for days where no event occurred. 
+
+```{r}
+events_count<-events_count|>
+  complete(event_date = full_seq(event_date, period=1), # get a complete sequence of days
+           nesting(event_type),                         # nest by the grouping variable
+           fill=list(n=0)                               # fill empty rows with 0
+           )
+
+```
+
+
+Finally, we'll group by event_type and create a rolling 30-day count of each event type using the `rollsum` function from the `zoo` package.
+
+```{r}
+
+
+events_count<-events_count|>
+  group_by(event_type)|>
+  mutate(rolling_count = zoo::rollsum(n, 
+                                      k=30,  # the size of the rolling window
+                                      na.pad=T)) 
+  
+
+
+```
+
+The result of this set of functions is a dataframe with a rolling count of protest events related to Covid. Now we can use this to create a line plot that will show the temporal patterns in protest activity over time:
+
+
+
+```{r, fig.width=12}
+ggplot(events_count,aes(x=event_date, y=rolling_count,  color = event_type))  + 
+  geom_line() + 
+  theme_bw() +
+  labs(x='date', 
+       y='rolling number of events',
+       color = 'event type',
+       title ='Covid related protests in China',
+       caption ='Source: ACLED'
+       ) +
+  # this will give us a tick mark every 4 months:
+  scale_x_date(date_labels = "%b '%y", 
+               date_breaks = '3 month'
+               )
+
+
+
+
+
+
+```
+
+
+
+#### On your own
+
+Follow the steps you used above to get a timeline of protest activity in Hong Kong over this same time frame. 
+
+
+```{r}
+# your code
+
+
+```
