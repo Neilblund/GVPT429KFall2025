@@ -478,7 +478,7 @@ You can also try swapping out the default basemap for something less "busy" usin
 ```{r}
 
 clustered_map|>
-  addProviderTiles(providers$Stadia.StamenToner)
+  addProviderTiles(providers$Esri.WorldStreetMap)
 
 
 
