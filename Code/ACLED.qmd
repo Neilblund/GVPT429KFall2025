@@ -322,11 +322,11 @@ The result of this set of functions is a dataframe with a rolling count of prote
 
 
 ```{r, fig.width=12}
-ggplot(events_count,aes(x=event_date, y=rolling_count,  color = event_type))  + 
+event_timeline<-ggplot(events_count,aes(x=event_date, y=rolling_count,  color = event_type))  + 
   geom_line() + 
   theme_bw() +
   labs(x='date', 
-       y='rolling number of events',
+       y='30 day rolling count of events',
        color = 'event type',
        title ='Covid related protests in China',
        caption ='Source: ACLED'
@@ -337,8 +337,26 @@ ggplot(events_count,aes(x=event_date, y=rolling_count,  color = event_type))  +
                )
 
 
+event_timeline
 
 
+
+```
+
+
+The results here should raise some immediate questions in your mind. For instance: it might prompt you to ask what factors explain the ebb and flow of activity over the course of the pandemic, and you might take a look at the "Strategic developments" or read some news coverage to try to get a better sense of when and why the activity levels shifted.
+
+
+In some cases, it might make sense to include a short annotation to mark significant events that happened at different points during the timeframe of interest. The code below adds a text annotation that marks when the Chinese government began to abandon their highly restrictive "zero Covid" policies:
+
+
+```{r, fig.width=12}
+
+event_timeline + 
+  annotate(geom='label', 
+           x =as.Date('2022-12-07'), 
+           y=61, 
+           label='December 7, 2022: gov. loosens Covid restrictions')
 
 
 ```
@@ -352,6 +370,117 @@ Follow the steps you used above to get a timeline of protest activity in Hong Ko
 
 ```{r}
 # your code
+
+
+```
+
+
+
+
+# Extra code: Interactive event mapping
+
+We can use the leaflet package to create an interactive map of protest events in Hong Kong. Note that this kind of interactive plot only works with HTML formatted output, so you would need to use Rmarkdown to knit this as html before you could share it with someone else. That said, this can be a useful way to get a better grasp of your data even if you don't end up sharing it with anyone else.
+
+```{r}
+# install.packages("osmdata")
+# install.packages("leaflet")
+# install.packages('glue')
+
+```
+
+
+Start by creating a base mapping layer using the `addTiles` function. This will just create an empty world map. You can try zooming in to look at specific areas here:
+
+```{r}
+library(leaflet)
+
+base_map <- leaflet() |>
+  addTiles()
+  
+base_map
+
+```
+
+
+We'll use the `getbb` function from the osmdata package to get the coordinates for Hong Kong. This will make it so our base map is automatically zoomed in to show the area of interest:
+
+```{r}
+
+hkbox  <- osmdata::getbb("Hong Kong, China")
+
+event_map <- base_map |>
+  fitBounds(
+    lng1 = hkbox[1],
+    lng2 = hkbox[3],
+    lat1 = hkbox[2],
+    lat2 = hkbox[4]
+  )
+
+event_map
+
+
+```
+
+
+Finally, we'll make some formatted pop-up markers that will show a bit more information about each event. The `glue` function here performs string interpolation, and the `<br>` tags are just HTML that creates a line break (this will be easier to understand once you take a look at the map)
+
+For the sake of keeping things manageable, we'll only look at events that happened in 2019. I'll also remove events
+
+```{r}
+
+hk_map_events <- hk_events|>
+  filter(year(event_date) == 2019)|>
+  filter(geo_precision == 1)|>
+  mutate(formatted_notes = glue::glue('Date: {event_date}
+                                      <br>
+                                      Actor 1: {actor1}
+                                      <br>
+                                      Actor 2: {actor2}
+                                      <br>
+                                      Action: {sub_event_type}
+                                      <br>
+                                      Description: {notes}
+                                      '))
+
+```
+
+
+Now we'll add markers for each event. Since many events happened in the same location, we'll use the `markerClusterOPtions` function to create a clustered marker that will spread out when we click or zoom in on a location:
+
+```{r}
+clustered_map <- event_map |>
+  addAwesomeMarkers(
+    data = hk_map_events,
+    lng =  ~ longitude,
+    lat =  ~ latitude,
+    #icon = makeAwesomeIcon(icon = "Home", library = "glyphicon",
+    #                       markerColor = 'red'
+    #                       ), # uncomment to change the marker style 
+    
+    # groups together overlapping markers. Zoom in to show events
+    clusterOptions = markerClusterOptions(),
+    
+    # create a popup to show additional info on reported events on click
+    popup =  ~ formatted_notes
+    
+  )
+
+
+
+clustered_map
+
+```
+
+
+You can also try swapping out the default basemap for something less "busy" using the [`addProviderTiles()`](https://rstudio.github.io/leaflet/articles/basemaps.html) function. (Note that using some of these may require you to sign up for an account)
+
+
+```{r}
+
+clustered_map|>
+  addProviderTiles(providers$Stadia.StamenToner)
+
+
 
 
 ```
