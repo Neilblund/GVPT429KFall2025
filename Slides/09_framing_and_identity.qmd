@@ -1,0 +1,319 @@
+---
+title: "Framing and identity"
+bibliography: references.bib
+format:
+  revealjs:
+    theme: [default, clean]
+    df-print: paged
+    css: styles.css
+    slide-number: true
+    header: 
+    header-logo: images/informal_seal_transparent.webp
+    self-contained: true
+filters:
+  - reveal-header
+code-annotations: select
+slide-level: 3
+---
+
+# Framing
+
+::: notes
+-   some mild pushback here on rational-choice/structural understandings of contention: even if the benefits exceed the costs, people need to do some mental work to define "benefits" in the first place. Defining problems, solutions, responsible parties etc. are all important parts of what activists attempt to "do" - and even among people who generally agree on problems may disagree on these issues.
+
+-   Constructivist view: "meaning" isn't something that just exists "out there" in the natural world, it's something we create.
+:::
+
+## Framing
+
+:::::: columns
+::: {.column width="50%"}
+<blockquote>
+
+...schemata of interpetation \[that enable individuals\] to locate, perceive, identify and label experiences
+
+— Irving Goffman (1974)
+
+</blockquote>
+:::
+
+:::: {.column width="50%"}
+Examples:
+
+::: incremental
+-   Selective emphasis/de-emphasis of certain facts
+
+-   Arguments that justify action or inaction
+
+-   Attributions/denials of responsibility
+:::
+::::
+::::::
+
+## Politicizing the personal
+
+::::: columns
+::: {.column width="50%"}
+![1952 Ad for Ingles automatic washer](images/ingles_laundry_ad.jpg){fig-alt="Illustration of a woman with standing behind an Inglis brand washer. The text states \"My washdays are holidays now\"" width="100%"}
+:::
+
+::: {.column width="50%"}
+![Flyer from the International Wages for Housework Campaign](images/wages-for-housework-893fc066-3b45-4c32-9e94-6a7c30390c2-resize-750.jpg){fig-alt="Flyer describing the campaign for wages for housework. Claims such as \"love doesn't pay the bills\" and \"money is a choice\" appear in the text" width="70%"}
+:::
+:::::
+
+::: notes
+A lot of the pushback here comes from the emergence of movements that coalesce around issues that are orthogonal to class: feminist, gay rights, environmental etc. movements all make at least some claims that are not rooted entirely in a material interest, and they seek to politicize problems that might have been seen as entirely personal issues a short time ago.
+
+We might both agree that housework imposes undue burdens on women, but that could lead us to very different conclusions about the nature of the problem and the feasible solutions.
+
+Carol Hanish, writing in 1970, is credited with popularizing the phrase "the personal is political" as a pushback against the notion that issues like inequitable division of housework and childcare were individualized problems.
+:::
+
+## Core framing tasks
+
+-   Diagnostic
+
+-   Prognostic
+
+-   Motivational
+
+### Diagnostic
+
+What is the problem, and who is at fault?
+
+::::::: fragment
+:::::: columns
+:::: {.column width="50%"}
+::: incremental
+-   Who is to blame for climate change?
+
+-   Is it a systemic problem or a problem of individual over-consumption?
+
+-   How does it relate to other issues like global inequality?
+:::
+::::
+
+::: {.column width="50%"}
+![](images/capitalism-kills-our-climate-flyer.png){width="70%"}
+:::
+::::::
+:::::::
+
+:::
+
+### Prognostic
+
+What, if anything, should be done about the problem?
+
+:::::: columns
+:::: {.column width="50%"}
+::: incremental
+-   MADD emerged at a time when drunk driving was often addressed alongside other public health problems associated with alcohol use.
+
+-   MADD successfully persuaded politicians to address it as a criminal justice issue.
+:::
+::::
+
+::: {.column width="50%"}
+![](images/candy_lightner.jpg)
+:::
+::::::
+
+### Motivational
+
+Who should act and why?
+
+:::::: columns
+:::: {.column width="50%"}
+::: incremental
+-   "Pity" and "charity" frames can be effective ways to mobilize donations to disability-related causes.
+
+-   But disability activists argue they undermine other goals like dignity, access, and personal autonomy.
+:::
+::::
+
+::: {.column width="50%"}
+![](images/adapt_protest.webp)
+:::
+::::::
+
+### Re-Framing white power politics
+
+:::::: columns
+:::: {.column width="50%"}
+::: incremental
+-   Civil rights movement established a general norm against expressions of overt racism or support for white supremacy.
+-   Post 1980s white supremacist activists attempt to mirror civil rights/human rights discourse rather than challenging it explicitly.
+-   This re-framing allowed activists like David Duke to maintain a foothold in American politics even as the Klan itself became stigmatized.
+:::
+::::
+
+::: {.column width="50%"}
+<blockquote>a person like me speaks up and says, "Look, I'm interested in white rights"... he's going to be totally ripped to shreds.... But if a person gets up and says, "Well, I'm concerned about preserving Jewish culture"... then nothing happens. — David Duke (former Klan leader)</blockquote>
+:::
+::::::
+
+## Some empirical research on framing
+
+### Homeless mobilization: Cress and Snow (2000)
+
+@cress2000outcomes
+
+::::: columns
+::: {.column width="50%"}
+- How does framing impact the success/failure of homeless advocacy groups?
+- Uses a set of in-depth interviews/data collection on 15 homeless advocacy groups.
+:::
+
+::: {.column width="50%"}
+![](images/benford_snow_qualcom.png)
+:::
+:::::
+
+
+### Homeless mobilization: Cress and Snow (2000)
+
+::::: {.columns}
+::: {.column width="50%"}
+- Authors use qualitative-comparative analysis to identify what they say are "necessary/sufficient" conditions for success.
+- Findings suggest diagnostic/prognostic framing are important features alongside things like opportunity structure and resources.
+
+:::
+::: {.column width="50%"}
+![](images/benford_snow_results.png)
+:::
+:::::
+
+### Framing human rights appeals: McEntire, Leiby and Krain (2015)
+
+@mcentire2015human
+
+:::::: columns
+::: {.column width="50%"}
+-   What messages increase support for human rights causes? What messages increase willingness to participate?
+
+-   Survey experiment using three framing types: "Informational", "Personal" or "Motivational"
+:::
+
+:::: {.column width="50%"}
+::: r-stack
+![](images/informational_frame.png){.fragment width="100%"}
+
+![](images/personal_male_frame.png){.fragment width="100%"}
+
+![](images/motivational_frame.png){.fragment width="100%"}
+:::
+::::
+::::::
+
+
+### Framing human rights appeals: McEntire, Leiby and Krain (2015)
+
+
+![](images/frame_experiment_ologit.png)
+
+
+### Framing human rights appeals: McEntire, Leiby and Krain (2015)
+
+
+![](images/frame_experiment_predictions.png)
+
+### Framing in social media texts: Mendelsohn et. al. (2024)
+
+@mendelsohn2024framing
+
+::::: {.columns}
+::: {.column width="50%"}
+- How do different socio-cultural groups frame issues on social media?
+- Authors use text analysis on twitter social media posts from 2018-2019 to identify frames that are more or less common for differetn causes/levels of activity/or types of tweet.
+:::
+::: {.column width="50%"}
+![](images/frame_mfx.png)
+:::
+:::::
+
+
+
+
+# Identity
+
+## Identity and interests
+
+-   "Collective interests" play a key role in most accounts of contention, but this depends on a self concept.
+
+-   Identities are constructed, overlapping, and may become salient (or not) depending on the scenario.
+
+## Tajfel and Turner: Self categorization
+
+::::: columns
+::: {.column width="50%"}
+![:scale 70%](https://www.guggenheim.org/wp-content/uploads/1923/01/37.262_ph_web-1.jpg)
+:::
+
+::: {.column width="50%"}
+-   In a series of experiments, Henri Tafjel and John Turner attempted to foment inter-group conflict on the basis of essentially meaningless distinctions.
+:::
+:::::
+
+## Tajfel and Turner: Self categorization
+
+::::: columns
+::: {.column width="50%"}
+![:scale 70%](https://www.guggenheim.org/wp-content/uploads/1923/01/37.262_ph_web-1.jpg)
+:::
+
+::: {.column width="50%"}
+Social identity theory: - Social Categorization: who are we? - Social comparison: How are we doing relative to other groups? - Social Identity: Desire for positive distinctiveness leads to either assimilation or collective action
+:::
+:::::
+
+## Early gay rights movements
+
+:::::: columns
+:::: {.column width="50%"}
+::: incremental
+-   Early gay rights activism often promoted assimilation and downplayed the importance of sexual orientation.
+-   The emergence of the psychiatric model of "homosexuality" made it a fixed characteristic.
+-   The "Lavender Scare" portrayed many gay people as intrinsically untrustworthy.
+:::
+::::
+
+::: {.column width="50%"}
+![Flyer for the Mattachine Society (founded in 1950)](https://www.nps.gov/ston/learn/photosmultimedia/images/1696841.jpg)
+:::
+::::::
+
+::: notes
+:::
+
+## Modern gay rights movements
+
+::::::: columns
+:::: {.column width="50%"}
+::: incremental
+-   Without the ability to assimilate out of a stigmatized identity, many gay activists shifted their energy towards promoting a positive self-identity.
+:::
+::::
+
+:::: {.column width="50%"}
+::: fragment
+![](images/glf-getty-malcolm-clarke-keystone-getty-images2.avif)
+:::
+::::
+:::::::
+
+::: notes
+:::
+
+## Questions
+
+- When/how does identity become salient?
+- Does identity trump material interests?
+- Can we make meaningful predictions about the role of identity in contentious politics in general?
+
+
+
+## Citations
+
+
