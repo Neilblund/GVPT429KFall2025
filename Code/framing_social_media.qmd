@@ -1,0 +1,446 @@
+---
+title: "Working with text"
+editor: visual
+format:
+  html:
+    df-print: kable
+    toc: true
+    toc-location: left
+    toc-depth: 4
+    smaller: true
+    self-contained: true
+    code-annotations: hover
+---
+
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+posts<-readRDS('posts.rds')
+no_kings_data <- readRDS('no_kings_posts.rds')
+no_kings_june_posts <- readRDS('nokings_june.rds')
+
+```
+
+
+In this class, we'll use some basic text analysis tools to assess how movement activists and supporters attempt to shape public opinion and mobilize support through their rhetoric. We'll use social media data here because its easily accessible, but keep in mind that these basic tools would work equally well on any other reasonably large collection of texts related to some social movement, group or instance of contention.
+
+Other places you might look to collect data of this sort might be:
+
+- Organization websites or activist blogs
+- Press releases
+- Quotes from activists, pamphlets, signs etc.
+
+
+For this analysis, we'll collect posts about the "No Kings" protests from the Bluesky microblogging platform - which is one of the few social media outlets that still provide free API access to non-commercial users.
+
+
+
+Run the code below to install some additional packages we'll use:
+
+
+```{r}
+
+
+packages_to_install <- c("bskyr", 
+                         "quanteda", 
+                         "quanteda.textplots",
+                         "quanteda.textstats", 
+                         "quanteda.sentiment"
+                         )
+
+
+for (pkg in packages_to_install) {
+  if (!require(pkg, character.only = TRUE)) {
+    install.packages(pkg)
+  }
+}
+
+
+```
+
+
+```{r}
+
+library(tidyverse)
+library(bskyr)
+library(quanteda)
+library(quanteda.textplots)
+library(quanteda.textstats)
+library(quanteda.sentiment)
+
+
+
+```
+
+## Setting up a Bluesky account
+
+1. Create a Bluesky account (or log into your account if you already have one)
+
+2. Navigate to [https://bsky.app/settings/app-passwords](https://bsky.app/settings/app-passwords)
+
+3. Click the button to "Add and App Password". This should bring up pop up window. Be sure you copy your randomly generated app password and paste it into an R script or notepad file so you can use it in a moment.
+
+
+4. In R-Studio, run `usethis::edit_r_environ()` to open up a .Renviron file. Add the following lines (substituting the text in quotation marks with your own username and the app password you just created)
+
+```{r, eval=FALSE}
+BLUESKY_APP_PASS = 'bluesky app password'
+BLUESKY_APP_USER = 'bluesky username'
+```
+
+5. Hit CTRL/CMD + S to save your .Renviron file and then restart R. You should now be able to access your username by running:
+
+```{r,eval=FALSE}
+Sys.getenv('BLUESKY_APP_USER')
+```
+
+We can use the [https://cran.r-project.org/web/packages/bskyr/refman/bskyr.html](bskyr) app to do things find tweets that match a query string or get posts from a particular user.
+
+Install the `bskyr` package. If you've set up your `.Renviron` file correctly, the commands below should both return values of `TRUE`. Once this is done, you should be able to retrieve data from Bluesky:
+
+
+```{r}
+
+library(bskyr)
+bs_has_user()
+bs_has_pass()
+
+```
+
+
+## Searching posts
+
+The basic search function is called [`bs_search_posts`](https://cran.r-project.org/web/packages/bskyr/refman/bskyr.html#bs_search_posts). You can test it out by running the code below:
+
+```{r, eval=FALSE}
+
+
+posts<-bs_search_posts("rally", 
+                       limit=10)
+
+```
+
+Use `glimpse` or right click on the `posts` data frame in Rstudio to get a look at the variables here. You might notice that the structure of this data set is kind of unusual:
+
+```{r}
+glimpse(posts)
+
+```
+
+
+Several columns - such as `author` and `record` - are nested lists where each cell contains multiple additional pieces of information. This kind of nested structure is common for social media data. For our analysis, however, we really just want to retrieve a few pieces of information from these lists.
+
+We'll use the `hoist` function to retrieve the post text from the "records" column and the account handle from the "author" column. Then we'll do a little more clean up to create a new data set without any of the nesting we had in the original response:
+
+
+```{r}
+
+post_data<-posts|>
+  hoist('record', 'text')|>
+  hoist('author', 'handle')|>
+  mutate(url = purrr::map_chr(.x=uri, .f=bs_uri_to_url))|>
+  select(uri, 
+         url,
+         handle, 
+         bookmark_count, 
+         reply_count, 
+         like_count, 
+         quote_count,
+         text
+         
+         )
+  
+
+post_data|>glimpse()
+
+```
+
+
+
+
+## Getting posts about the No Kings protests
+
+
+We'll use the `bs_search_posts` function to get posts from the day of the most recent "No Kings" protests that contains the string "nokings". 
+
+Since we're interested in posts from a specific time window, we'll add the `since` and `until` arguments to limit the results so they only include data from October 18. We'll use `sort='top'` to find posts with the most "likes", and we'll use the "lang='en'" argument to restrict our results to posts that are in English. Finally, we'll add `limit = 10000` to retrieve 10,000 results instead of just a handful. Note that this *still* might not give us all of the posts from that day, but it gives us enough to work with for now.
+
+```{r, eval=FALSE}
+
+
+no_kings_data<-bs_search_posts(query = 'nokings',
+                      since = "2025-10-18T00:00:00Z",
+                      until = "2025-10-18T23:59:00Z",
+                      sort ='top',
+                      lang = 'en',
+                      limit = 10000
+)
+
+
+
+
+```
+
+We'll apply the same pre-processing steps we used above to get this into a more usable format:
+
+```{r}
+
+
+nokings<-no_kings_data|>
+  hoist('record', 'text')|>
+  hoist('author', 'handle')|>
+  mutate(url = purrr::map_chr(.x=uri, .f=bs_uri_to_url))|>
+  select(uri, 
+         url,
+         handle, 
+         bookmark_count, 
+         reply_count, 
+         like_count, 
+         quote_count,
+         text
+         
+         )|>
+  distinct(url, .keep_all = T)
+
+
+
+```
+
+
+
+
+Take a second to scroll through the data set to get a sense of what sorts of posts we've collected here. See if you can make a visualization to see the distribution of "likes" or the top 10 posters by number of posts or number of total likes.
+
+
+
+You can also try doing a little manual categorization of a random sample of the posts. The code below will create a csv file with a random sample of 25 posts. Open the csv file in excel and create a new column. Read each post and try to identify whether it contains:
+
+- information about how/where to participate
+- a statement about crowd size
+- a claim about the identity of the protesters
+
+
+
+```{r, eval=FALSE}
+
+
+
+nokings|>
+  slice_sample(n = 25)|>
+  write_csv(file='nokings_sample.csv')
+
+
+```
+
+
+
+
+## Quantitative analysis of text
+
+
+We'll use some text analysis tools to try to characterize the nature of the frames included in this collection of posts.
+
+
+To do this, we'll use some functions from the `quanteda` package. You can read more about using this [package here](https://tutorials.quanteda.io/). 
+
+Our first step will be converting the data frame into a `corpus` - a special class of data used to hold a collection of documents and their associated metadata.
+
+
+
+```{r}
+
+
+tweets_corpus<-nokings|>
+  corpus(docid_field = 'uri',
+         text_field = 'text'
+         )
+
+
+```
+
+Next, we'll use the `tokens` function to convert our corpus into a list of "tokens". In this instance, that means splitting the text up into individual words:
+
+
+```{r}
+tweet_tokens <- tweets_corpus|>
+  tokens()
+
+
+
+tweet_tokens[1:5]
+
+
+```
+
+### KWiC
+
+Key Words in Context (KWiC) is a useful starting point for conducting qualitative analysis of large text collections like this. We'll pass a term or phrase to the `kwic` and it will show us posts that contain that key word along with some of the surrounding context. 
+
+
+
+```{r}
+
+kwic_data<-tweet_tokens|>
+  kwic(pattern = phrase('we are'))
+
+# Viewing the first five:
+kwic_data|>
+  slice_head(n=5)
+
+
+```
+
+
+Take a moment to scroll through the results to see if you can identify any broad categories of claims being made in these posts. If you want to save KWIC data for additional analysis outside of R, you can use the code below to export these results to a csv file that you can open in any spreadsheet software:
+
+```{r, eval=FALSE}
+
+kwic_data<-tweet_tokens|>
+  kwic(pattern = phrase('we are'))
+
+
+write_csv(as.data.frame(kwic_data), file='kwic_data.csv')
+
+
+
+```
+
+
+
+### Wordclouds
+
+Another way we can visualize some of the rhetoric here is to use a wordcloud. To prepare the data for this analysis, we're going to create a `Document-Feature-Matrix` - essentially, a data frame with one row for each post, and one column for every word that appears in the entire corpus of posts.
+
+To prepare the data, I'll also use `remove_punct` to strip out some punctuation marks, and I'll remove "stopwords" (commonly occuring terms like "if" or "and"), finally, I'll remove the term "Kings" entirely from each tweet, and then use `dfm_trim(min_termfreq=4)` to remove terms that occur fewer than 4 times in the entire corpus:
+
+```{r}
+tweet_dfm<-
+  tweets_corpus|>
+  tokens( remove_punct=TRUE)|>
+  tokens_remove(stopwords('en'))|>
+  tokens_remove(pattern = "kings", valuetype='regex')|>
+  dfm()|>
+  dfm_trim(min_termfreq = 4)
+
+
+```
+
+(You can get a sense of the structure here by just entering `tweet_dfm` into the R console)
+
+
+Once I've applied these steps, I can use `textplot_wordcloud` to create my word cloud:
+
+
+```{r}
+tweet_dfm|>
+  textplot_wordcloud()
+
+```
+
+
+
+
+### Comparisons
+
+
+In addition to describing the kinds of terms used in the data, we might want to compare term frequencies between posts about two different topics or movements, or between two time periods. 
+
+The code below will get posts mentioning "Nokings" from the June 14th events.
+
+```{r, eval=FALSE}
+
+
+no_kings_june_posts<-bs_search_posts(query = 'nokings',
+                      since = "2025-06-14T00:00:00Z",
+                      until = "2025-06-14T23:59:00Z",
+                      sort ='top',
+                      lang = 'en',
+                      limit = 5000
+)
+
+
+
+
+```
+
+We'll then apply the same set of pre-processing steps we used to analyze the October posts to the new data set here:
+
+
+```{r}
+
+
+nokings_june<-no_kings_june_posts|>
+  hoist('record', 'text')|>
+  hoist('author', 'handle')|>
+  mutate(url = purrr::map_chr(.x=uri, .f=bs_uri_to_url))|>
+  select(uri, 
+         url,
+         handle, 
+         bookmark_count, 
+         reply_count, 
+         like_count, 
+         quote_count,
+         text
+         
+         )|>
+  distinct(url, .keep_all = T)
+
+
+
+
+june_tweet_dfm<-
+  nokings_june|>
+  corpus(docid_field = 'uri',
+         text_field = 'text'
+         )|>
+  tokens( remove_punct=TRUE)|>
+  tokens_remove(stopwords('en'))|>
+  tokens_remove(pattern = "kings", valuetype='regex')|>
+  dfm()|>
+  dfm_trim(min_termfreq = 4)
+
+
+```
+
+
+Finally, we'll use `rbind` to combine the two Document-Feature-Matrices and add a document variable to indicate whether each post came from June or October:
+
+```{r}
+
+combined_dfm<-rbind(tweet_dfm, june_tweet_dfm)
+docvars(combined_dfm, 'source') <- rep(c("October", "June"), 
+                                       c(nrow(tweet_dfm), nrow(june_tweet_dfm))
+                                       )
+
+
+
+```
+
+
+Now, we'll calculate a "keyness" statistic to identify terms that are more strongly associated with one set of events vs. another. By default, the keyness statistic is based on a $\chi^2$ statistic, so it gives a measure of how much more frequently a term occurs in one subset of the data compared to a null hypothesis where all terms are equally likely to occur in both subsets of the data: 
+
+```{r}
+
+tstat_key<-textstat_keyness(combined_dfm, 
+                            target = docvars(combined_dfm, 'source') == "October",
+                            n = 30
+                            )
+
+textplot_keyness(tstat_key)
+
+
+```
+
+Take a minute to see if you can spot important differences between these groups and come up with some explanations for their presence. 
+
+## Extensions
+
+
+Some other options you might consider when conducting this kind of analysis are:
+
+- Examining the hashtags associated with each event
+- Looking at term frequencies over time
+- Comparing NoKings protests to some other event that was widely discussed on this site or on a similar platform.
+
