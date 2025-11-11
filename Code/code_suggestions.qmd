@@ -1,0 +1,314 @@
+---
+title: "Code suggestions"
+format:
+  html:
+    df-print: paged
+    toc: true
+    toc-location: left
+    toc-depth: 4
+    smaller: true
+    self-contained: true
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+library(tidyverse)
+```
+
+## 1. Chunk options and caching
+
+
+When using markdown, you can add additional options to code chunks to modify their behavior. For instance adding `echo=FALSE` would allow you to show the results from R code without showing the code itself.
+
+
+Try copy-pasting the code chunk below into a markdown document and then knit it to an HTML file. Take a look at what happens when you change `echo=FALSE` to `echo=TRUE` and then knit the code again.
+
+````{verbatim}
+
+```{r, echo=FALSE}
+x<-c(1, 2, 3, 4)
+y<- x*3
+plot(x, y)
+
+```
+
+````
+
+
+If you have lots of code that you want to avoid showing, you can also add the line `code_folding: true` to your YAML header at the top of the page. Try compiling your markdown document with and without this line:
+
+````{verbatim}
+
+---
+title: "Title"
+output: 
+  html_document:
+    toc: true
+    code_download: true
+    df-print: paged
+    code_folding: true
+name: "YOUR NAME"
+date: "`r Sys.Date()`"
+
+
+---
+
+````
+
+
+## 2. Caching
+
+
+When you have code that takes a long time to run, it may be a good idea to "cache" it so that it doesn't need to be re-evaluated each time you try to turn your document into an HTML file. When you add `cache=TRUE` to a chunk, the code in that section will only run if that code has changed, otherwise, it will be skipped entirely.
+
+
+Try copying the code below into a markdown document and then knitting it to HTML. Take note of the amount of time needed to create the document. When it finishes, knit the file again - it should run much more quickly because the call to `acled_api` has been cached. 
+
+Try changing the `country` argument to a different country and the knit the file again - this will run slowly because the cached code has changed and so it is re-evaluated when you compile.
+
+````{verbatim}
+
+
+```{r}
+
+# Loading the libraries
+
+library(acledR)
+library(tidyverse)
+
+```
+
+
+```{r, cache=TRUE}
+
+# Getting data from ACLED (cached)
+
+result<-acled_api(
+  email = Sys.getenv('acled_email'),
+  password = Sys.getenv('acled_password'),
+  population ='best',
+  start_date = '2018-01-01',
+  end_date = '2025-11-4',
+  country = 'China'
+)
+
+write_csv(result, file='china_data.csv')
+
+```
+
+
+
+
+```{r}
+
+# reading the saved China acled data into R:
+
+china_data<-read_csv('china_data.csv')
+
+nrow(china_data)
+
+
+```
+
+````
+
+
+## 3. Headers and sections
+
+
+Using `#` inside an R code chunk will add a comment, but `#` in other sections will create a section header. Try copy-pasting the code below into your markdown document and then compile the results:
+
+
+````{verbatim}
+
+# Section 1
+
+Some text in section 1
+
+## Section 1A
+
+Some more information on the topic of section 1
+
+## Section 1B
+
+Some additional information related to this topic
+
+
+# Section 2
+
+
+```{r}
+# A comment
+
+```
+
+````
+
+
+## 4. Re-sizing and exporting figures
+
+
+When you're working in markdown, you can resize figures by setting the `fig.width` and `fig.height` options in your code chunk.
+
+````{verbatim}
+
+```{r, fig.width=5, fig.height=10}
+library(ggplot2)
+
+set.seed(99)
+x<-rnorm(100)
+y<-rnorm(100)
+df<-data.frame(x, y)
+ggplot(df, aes(x=x, y=y)) + 
+  geom_point()
+
+
+
+```
+
+
+```{r, fig.width=10, fig.height=3}
+library(ggplot2)
+
+set.seed(99)
+x<-rnorm(100)
+y<-rnorm(100)
+df<-data.frame(x, y)
+ggplot(df, aes(x=x, y=y)) + 
+  geom_point()
+
+
+
+```
+
+````
+
+
+If you're not using markdown, remember that you can include plots and graphs in a word document by either copy-pasting directly from the plot window, or by saving the plot to a file and then importing that file into your document. You can use the `ggsave` function for saving plots with additional options and formats.
+
+
+
+
+```{r, eval=FALSE}
+
+library(ggplot2)
+
+set.seed(99)
+x<-rnorm(100)
+y<-rnorm(100)
+df<-data.frame(x, y)
+plot<-ggplot(df, aes(x=x, y=y)) + 
+  geom_point()
+
+
+ggsave(plot, file='scatterplot.png', 
+       height=10, width=10,  
+       dpi = 300 # controls the resolution
+       )
+
+
+
+```
+
+
+When creating figures, be careful to ensure your plot is still readable. If you have a lot of overlapping text on the axes, and easy way to correct this is to simply re-size the plot.
+
+
+
+## 5. Annotating plots
+
+
+You can add some annotations to a timeline plot to highlight key events.
+
+
+```{r, fig.width=10}
+
+hk_data<-read_csv('china_data.csv')|>
+  filter(admin1=="Hong Kong")
+
+events_count<-hk_data|>
+  filter(event_type %in%  c("Protests", "Riots"))|> 
+  count(event_date, event_type)|>
+  mutate(event_date = as.Date(event_date))|>
+  complete(event_date = full_seq(event_date, period = 1),
+           fill = list(n=0),
+           nesting(event_type)
+  )|>
+  group_by(event_type)|>
+  arrange(event_date)|>
+  mutate(rolling_count = zoo::rollsum(n,
+                                      k = 30,
+                                      na.pad = T))
+
+
+event_timeline<-ggplot(events_count,
+                       aes(x = event_date, 
+                           y = rolling_count,  
+                           color= event_type)
+                       )  + 
+  geom_line() + 
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45,
+        hjust = 1,                              # Added vjust/hjust to slightly offset x-axis marks from the x-axis line
+        vjust = 1
+        )) + 
+  labs(x = 'Date', 
+       y = '30 day rolling count of events',
+       fill= 'Type of event',
+       title = 'Protests in China',
+       caption = 'Source: ACLED'
+  ) +
+  scale_x_date(date_labels = "%b '%y", 
+               date_breaks = '3 months'
+  ) +
+  scale_color_manual(values = c('blue','black'))
+
+event_timeline
+
+```
+
+
+```{r, fig.width=10}
+
+event_timeline + annotate(geom='label', 
+                          x=as.Date("2019-10-01"), 
+                          y=160,
+                          label = "Oct 1, 2019: 70th anniversary of communist party rule"
+                          )
+
+
+```
+
+
+
+You can also create a data frame with multiple annotations and then include them as a `ggplot` geometry. Here's an example that uses `ggtext` to add some additional styling:
+
+```{r, fig.width=10}
+library(ggtext)
+
+annotations<-data.frame(x=as.Date(c("2019-10-01", "2020-06-01")), 
+                        y = c(155,  140),
+                        label = c("70th anniversary of communist party rule",
+                                  "May-June resurgence"
+                                  ))
+
+
+event_timeline + geom_richtext(data= annotations, 
+                               aes(x=x, y=y, label=label), 
+                               inherit.aes = FALSE)
+
+```
+
+## 6. Analysis
+
+A couple of things to keep in mind when analyzing ACLED data:
+
+1. Contentious issues will often draw protests on both sides, so don't assume that everything you've pulled represents protest in favor of your chosen topic. You may need to do some additional filtering of the notes or actors columns to distinguish pro/anti activities.
+
+2. Remember that you usually want to filter out "Strategic developments" when plotting, but you might still want to review these observations yourself to get a sense of key events. [Read here for more info on how to use "Strategic developments" in ACLED](https://acleddata.com/methodology/strategic-developments-acled-dataset)
+
+3. Check the website for some tips and example for making better use of this data. The [methodology](https://acleddata.com/conflict-data/knowledge-base/methodology) section has some excellent advice and example code (usually written in R) for using the data and interpreting results.
+
+
+
