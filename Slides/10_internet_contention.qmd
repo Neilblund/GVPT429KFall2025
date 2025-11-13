@@ -1,0 +1,369 @@
+---
+title: "Contention and the internet"
+bibliography: references.bib
+format:
+  revealjs:
+    theme: [default, clean]
+    df-print: paged
+    css: styles.css
+    slide-number: true
+    header: 
+    header-logo: images/informal_seal_transparent.webp
+    self-contained: true
+filters:
+  - reveal-header
+code-annotations: select
+slide-level: 3
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
+library(tidyverse)
+
+```
+
+# The internet and social movements
+
+## Gezi Park Protests
+
+
+![Gezi Park](images/İstanbul_-_Taksim_Gezi_Parkı_-_Mart_2013_-_r4.jpg){width="90%"}
+
+
+
+::: notes
+-   Beginning May 27, 2013 and ending in mid August
+
+-   Initially an encampment style protest against a plan to develop the Gezi park area, but turned into a generalized protest against Erdogan
+
+:::
+
+## Gezi Park Protests
+
+
+
+![](images/Taksim_square_cleaning._Events_of_June_16,_2013-2.jpg){width="90%"}
+
+
+
+## Gezi Park Protests
+
+```{r, fig.width=10}
+vdem<-vdemdata::vdem|>
+  filter(country_name =='Türkiye')|>
+  filter(year>=1945)|>
+  mutate(date = as.Date(paste0(year, "-01-01")))
+
+
+
+yvalue<-vdem$v2x_libdem[which(vdem$year==2003)]
+yvalue2<-vdem$v2x_libdem[which(vdem$year==2013)]
+
+vdem|>
+ggplot(
+       aes(x=date, y=v2x_libdem)) + geom_line(lty=1, lwd=1) + 
+  theme_minimal() +
+  labs(y='Liberal-Democracy score',
+       x="Year",
+       title = "Turkey liberal democracy since 1945",
+       caption ='Source: VDEM 2020'
+       ) +
+ # geom_vline(xintercept=as.Date('2003-03-14'), 
+#             lty =2
+#             ) +
+  geom_segment(x=as.Date('2003-03-14'), xend=as.Date('2003-03-14'), y=0, yend=yvalue, lty=2) +
+  annotate(geom='label', x=as.Date('2003-03-14')+2500, y=0.525, 
+           label='Erdoğan becomes PM') +
+  geom_segment(x=as.Date('2013-05-27'), xend=as.Date('2013-05-27'), y=0, yend=yvalue2, lty=2) +
+  annotate(geom='label', x=as.Date('2013-05-27')+ 2200, y=yvalue2, 
+           label='Gezi Park protests')
+
+
+
+```
+
+
+
+
+## Gezi Park and social media
+
+
+- Not the first protest to use twitter, but notable for the sheer volume of social media activity related to the protests and their perceived importance for activists and opponents:
+
+
+
+> "Now we have a menace that is called Twitter… To me, social media is the worst menace to society" - Recep Tayyip Erdoğan
+
+
+
+
+## Gezi Park and social media
+
+
+::::: {.columns}
+::: {.column width="50%"}
+![](images/gezi_tweets.png)
+:::
+::: {.column width="50%"}
+![](images/gezi_park_language_tweets.png)
+
+:::
+:::::
+
+[@smapp2013gezi]
+
+
+
+## The internet and contentious politics
+
+
+::::: {.columns}
+::: {.column width="50%"}
+::: incremental
+- There's some consensus that the internet "matters" for contentious actors
+
+- There's not a consensus on whether it is a net positive or a net negative and how fundamentally it changes the calculus for contentious behavior.
+
+:::
+
+:::
+::: {.column width="50%"}
+![](images/gezi_bird.jpg)
+:::
+:::::
+
+
+
+
+## The internet as a tool
+
+
+::::: {.columns}
+::: {.column width="50%"}
+
+-   Information sharing (even under repression)
+
+:::
+::: {.column width="50%"}
+
+![](images/inspire_magazine.jpg) Inspire Magazine: online publication released by Al-Qaeda
+
+
+:::
+:::::
+
+## The internet as a tool
+
+
+::::: {.columns}
+::: {.column width="50%"}
+
+-   Information sharing (even under repression)
+
+-   Mobilization, framing and identity building (without the need for mainstream press coverage or direct social interaction) 
+
+:::
+::: {.column width="50%"}
+
+![](images/tufekci_facebook_protest.png)
+[@tufekci2012social]
+
+:::
+:::::
+
+
+## The internet as a tool
+
+::::: {.columns}
+::: {.column width="50%"}
+- A study of Gezi park social media activity found connections to the "periphery" were critical for spreading the messages and experiences of participants.  [@barbera2015critical]
+
+
+:::
+::: {.column width="50%"}
+![](images/barbera_core.png)
+:::
+:::::
+
+
+## The internet as a venue
+
+
+::::: {.columns}
+::: {.column width="50%"}
+
+- The internet itself is increasingly a *site* of contention:
+  - Online boycotts
+  - Coordinated harassment or pressure campaigns
+  - Politically motivated hacks
+
+:::
+::: {.column width="50%"}
+![Wikipedia's SOPA/PIPA blackout message](images/wikipedia_blackout_screen.jpg)
+
+:::
+:::::
+
+
+
+## Reasons for skepticism
+
+### High risk activism
+
+::::: columns
+::: {.column width="50%"}
+-   Classic Studies of "high-risk" activism found that strong social ties were key: committed activists are part of a community.
+
+-   ICT facilitated movements are wide-but-shallow. 
+
+
+
+:::
+
+::: {.column width="50%"}
+![](images/McAdam_recruitment.png)
+:::
+:::::
+
+
+### Slacktivism
+
+::::: {.columns}
+::: {.column width="50%"}
+
+::: incremental
+- **Catharsis** is the process of getting relief from an emotion by expressing it. 
+
+- **Slacktivism** refers to low-cost, low risk activities that express support or raise awareness of an issue. 
+
+- Taken together: opportunities for slacktivism might sap energy that would otherwise lead people to more impactful forms of participation
+
+:::
+
+:::
+::: {.column width="50%"}
+
+::: fragment
+
+```{=html}
+<div class="black-box", style='background-color: black;width:100%;height:400px;padding: 20px;'>
+
+</div>
+```
+
+:::
+
+:::
+:::::
+
+
+## Online repression
+
+The same tools that can facilitate contention can also facilitate repression and propaganda.
+
+![](images/digital_repression.png)
+[@earl2022digital]
+
+
+## Online repression
+
+::::: {.columns}
+::: {.column width="50%"}
+
+
+:::
+::: {.column width="50%"}
+![](images/ai_catch_revoke.png)
+
+:::
+:::::
+
+
+
+## Online repression
+
+::::: {.columns}
+::: {.column width="50%"}
+
+- Social media is centralized and less anonymous than might be assumed, so they can make systematic low-level repression easier.
+
+- The same resource advantages that favor corporate and state actors offline are mirrored in online spaces.
+
+:::
+::: {.column width="50%"}
+![](images/wikipedia_scientology.png)
+
+:::
+:::::
+
+
+
+## Online repression
+
+::::: {.columns}
+::: {.column width="50%"}
+
+- States have gotten much better at repressing online contention over time.
+
+
+- [@king2013censorship] found evidence of industrial-scale censorship of Chinese social media posts. Primarily targeted at efforts to mobilize people for offline activity.
+
+:::
+::: {.column width="50%"}
+
+![](images/china_censorship.png)
+
+
+:::
+:::::
+
+
+
+
+
+## Online repression
+
+::::: {.columns}
+::: {.column width="50%"}
+
+> "We estimate that the government fabricates and posts about 448 million social media comments a year."
+
+[@king2017chinese]
+
+
+:::
+::: {.column width="50%"}
+![](images/50ct_posts.png)
+
+
+:::
+:::::
+
+
+
+
+## Online repression
+
+
+
+::::: {.columns}
+::: {.column width="50%"}
+
+Examples of "cheerleading"
+
+
+![](images/50ct_examples.png)
+
+:::
+::: {.column width="50%"}
+![](images/50ct_content.png)
+
+:::
+:::::
+
+[@king2017chinese]
+
+
+## References
+
