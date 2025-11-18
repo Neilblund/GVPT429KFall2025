@@ -1,0 +1,229 @@
+---
+title: "CCC"
+editor: visual
+code-annotations: hover
+format:
+  html:
+    df-print: paged
+    toc: true
+    toc-location: left
+    toc-depth: 4
+    smaller: true
+    self-contained: true
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+```
+
+
+In this section, we'll talk through the process of filtering data based on some free-form text. While this isn't really "text analysis" its likely something that many of you will need to use if you're interested in getting protest events centered around a specific topic.
+
+### The CCC data
+
+We'll use data from the Crowd Counting Consortium (CCC). The CCC covers U.S. protest events from 2017 to the present, with new updates each week. These data are collected using a combination of webcrawling, social media analysis, and crowd-sourced contributions. The time frame and geographic scope is narrower compared to sources like ACLED, but they also tend to catch more events and offer a higher level of detail about each one.
+
+You can access the CCC data from their [github site](https://github.com/nonviolent-action-lab/crowd-counting-consortium). Note that they have two separate files: one for events from 2017-2020 and a separate one for events from 2021 to the present. We'll work with the 2021-Present file today.
+
+
+-   [Website](https://ash.harvard.edu/programs/crowd-counting-consortium/)
+
+-   [Dataverse](https://dataverse.harvard.edu/dataverse/crowdcountingconsortium/) (note the data is stored in 3 separate waves)
+
+-   [Codebook for the current wave](https://dataverse.harvard.edu/file.xhtml?fileId=10808412&version=10.1)
+
+We'll start by reading the data in and taking a look at our results
+
+
+```{r}
+library(tidyverse)
+url<-'https://dataverse.harvard.edu/api/access/datafile/12027896'
+ccc<-read_csv(url)
+
+```
+
+
+## Basic Descriptives
+
+
+
+```{r}
+
+
+```
+
+
+### Question
+
+Consult the codebook and write some code to get a count of the number of right wing vs. left wing protest.
+
+```{r}
+# your code here
+
+```
+
+## Unnesting
+
+You'll notice that many variables (`issue_tags` and `organizations` etc.) actually contain lists separated by semi-colons. This allows coders to record events involving multiple issues or groups, but for analysis this kind of coding raises some difficulties similar to the ones we encountered when using the Dynamics of Collective Action data.
+
+
+```{r}
+
+
+ccc|>
+  select(issue_tags_summary)|>
+  slice_head(n=5)
+
+```
+
+To make these results use-able for an analysis, we'll need to do some additional reshaping to these variables. I'll use the `str_split` function to split a nested list into a vector of separate elements:
+
+```{r}
+
+str_split("banking and finance; economy; foreign affairs; healthcare; war and peace", pattern = "; ")
+
+```
+Doing this to a data frame column will create a list-column where each row contains multiple values:
+
+```{r}
+ccc_issues<-ccc|>
+  mutate(issue_tags_separated = str_split(issue_tags_summary, "; "))
+
+ccc_issues$issue_tags_separated[1:3]
+
+
+```
+I'll use `unnest_longer` to create 1 new row for each element in this nested list. So, since the first event has five different issues listed, there will be five rows for that event. (I'll also add a `event_id` tag so I can tell what tags go with the same events)
+
+```{r}
+
+ccc_issues_long<-ccc_issues|>
+  mutate(event_id = row_number())|>
+  unnest_longer(issue_tags_separated)
+
+ccc_issues_long|>
+  select(event_id, issue_tags_separated)|>
+  slice_head(n =10)
+
+
+```
+
+
+Now I can use this result to do things like identify the most common issue tags across the data set:
+
+```{r}
+
+ccc_issues_long|>
+  count(issue_tags_separated)|>
+  arrange(-n)|>
+  slice_head(n =10)
+
+
+```
+
+
+## Filtering on subjects
+
+Another common goal is filtering the data based on some issue or topic. As with the ACLED data, we can filter the CCC data by matching different patterns in the text. Here's a simple example of doing that to match events where "Students" were listed as participants:
+
+
+```{r}
+ccc|>
+  filter(str_detect(participants, "[S|s]tudents"))|>
+  count()
+
+
+```
+
+These kinds of filters can get pretty elaborate. For instance, here's a slightly modified example of a set of regular expressions that CCC researchers used to track and identify protests related to Israel/Palestine:
+
+
+```{r}
+regex_schools <- c("college(?! (?:st(reet)?|ave(nue)?|r(oa)?d|cir(cle)?|dr(ive)?\\b|blvd|heights|point|green|athletic))",
+             "university(?! (?:st(reet)?|ave(nue)?|r(oa)?d|cir(cle)?|dr(ive)?\\b|blvd|heights|city|behavioral|hospital|plaza|lakes|office|irving))",
+             "school(?! (?:st(reet)?\\b|ave(nue)?|r(oa)?d|cir(cle)?|dr(ive)?\\b|blvd|heights))",
+             "\\bcooper union",
+             "institute of technology",
+             "\\bpoly(technic (state )?(?:institute|university))?",
+             "auraria campus",
+             "pentacrest",
+             "(?:naval|air force|military) academy|west point(?! hwy)",
+             "\\b(?:c|s)uny\\b",
+             "\\buc\\b(?! theatre)")|>
+  paste(collapse="|")
+regex_pro_palestine <- c("for palestinian (?:liberation|rights)", 
+                         "free palestine(?! from hamas)", 
+                         "in solidarity with (?:palestin|gaza)",
+                         "in remembrance of palestin", 
+                         "ceasefire in gaza",
+                         "against apartheid in israel",
+                         "(?:for ending|against) israel's occupation of palestin|genocide of palestin"
+)|>
+  paste(collapse="|")
+regex_pro_israel <- c("against violent attack on israel",
+                      "in (?:solidarity with|support of) israel",
+                      "stand with israel")|>
+  paste(collapse="|")
+
+pal <- ccc |>
+  filter(grepl(
+    regex_pro_palestine,
+    claims_summary,
+    ignore.case = TRUE,
+    perl = TRUE
+  )) |>
+  filter(!grepl("counter-protest", event_type)) |>
+  filter(!grepl("in solidarity with Israel", claims_summary, ignore.case = TRUE)) |>
+  mutate(
+    schools = factor(ifelse(
+      grepl(
+        regex_schools,
+        location,
+        ignore.case = TRUE,
+        perl = TRUE
+      ),
+      1,
+      0
+    ), labels = c("Not on campus", "On campus")),
+    encampment = factor(ifelse(
+      grepl("encamp", participant_measures, ignore.case = TRUE), 1, 0
+    ), labels = c("no", "yes")),
+    counterprotested = ifelse(!is.na(macroevent), 1, 0),
+    side = 'pro-Palestine'
+  )
+
+
+pal|>
+  count(date)|>
+  complete(date = full_seq(date, period=1), fill=list(n=0))|>
+  mutate(rolling_sum = zoo::rollsum(n, 14, na.pad=T))|>
+  ggplot(aes(x=date, y=rolling_sum)) +
+  geom_line() +
+  theme_bw() +
+  labs(x= "Date", y='events',
+       title ='Pro-Palestine protests')+
+  scale_x_date(date_labels = "%b %Y")
+
+
+
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+
+## Network analysis
+
+
+
+
