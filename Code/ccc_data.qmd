@@ -19,7 +19,18 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
 ```
 
 
-In this section, we'll talk through the process of filtering data based on some free-form text. While this isn't really "text analysis" its likely something that many of you will need to use if you're interested in getting protest events centered around a specific topic.
+Install these packages (if needed):
+
+```{r, eval=FALSE}
+
+
+install.packages(c("Matrix", "igraph", "visNetwork"))
+
+
+
+```
+
+
 
 ### The CCC data
 
@@ -48,16 +59,17 @@ ccc<-read_csv(url)
 ## Basic Descriptives
 
 
+Take a minute to explore the data and the codebook. Try:
 
-```{r}
+- Using `valence` to get a count of right vs. left wing protest.
 
+- Getting the number of total events.
 
-```
+- Getting a count of events by state.
 
+- Identifying the proportion of protests that were online.
 
-### Question
-
-Consult the codebook and write some code to get a count of the number of right wing vs. left wing protest.
+- Identify the most recent event covered.
 
 ```{r}
 # your code here
@@ -214,16 +226,132 @@ pal|>
 ```
 
 
+
+
+## Network analysis
+
+We'll set up an example of using this data to create a network visualization showing how frequently different groups protested together over the time period for this data set.
+
+
+We'll start by splitting the "organizations" column and recoding it to long format just like we did with the "issues" column. We'll do a little extra pre-processing to ensure we capture slight variations in spelling and formatting:
+
+
 ```{r}
+library(Matrix)
+library(igraph)
+library(visNetwork)
+
+```
+
+```{r}
+orglist<-ccc|>
+  mutate(orgs = str_split(organizations, "; "),
+         rowid = row_number()
+         
+  )|>
+  unnest_longer(orgs)|>
+  mutate(orgs = str_squish(orgs)|>tolower())|>
+  select(orgs, rowid)|>
+  drop_na()|>
+  group_by(orgs)|>
+  mutate(count = n())|>
+  ungroup()
+
+```
+
+
+Then, we'll need to convert this data frame into an adjacency matrix. Essentially, this will be a matrix with columns and rows for each organization, along with a count of the number of times each group appeared together at the same event:
+
+```{r}
+
+tab<-table(orglist[c('rowid', 'orgs')])|>Matrix(sparse=TRUE) # making a sparse matrix
+net_cmx<-crossprod(tab) 
+diag(net_cmx) <- 0  # setting the diagonals to zero
+mat<-as.matrix(net_cmx)  # converting back to a regular matrix
 
 
 
 ```
 
 
+Next, we'll convert out matrix intoa a weighted graph
 
-## Network analysis
+```{r}
+
+g<-graph_from_adjacency_matrix(mat, mode='undirected', weighted=T)
+
+table(degree(g))
+
+```
+
+
+We'll use `delete_vertices` to remove some of the least connected nodes from the graph. This isn't required, and it does mean we're throwing away data, but laying out a network with lots of nodes will take a lot longer, so this step reduces some of the computational complexity"
+
+
+```{r}
+
+
+g <- delete_vertices(g, which(degree(g)  < 20))
+# remove remaining nodes that are no longer connected to anything
+g <- delete_vertices(g, which(degree(g)  < 1))
+
+```
+
+
+We'll apply a layout algorithm to prepare the network for visualization. Different layout options from the igraph package will generate different versions of the same data, and the choice of algorithm is partly an aesthetic choice. `layout_with_fr` uses the Fruchterman–Reingold algorithm.
+
+```{r}
+
+layout <- layout_with_fr(g)
+
+```
+
+Finally, we'll perform community detection to identify "clusters" of closely related nodes and then color code each one according to its community. This should help us identify related organizatons that tend to group together a lot.
+
+```{r}
+
+communities <- cluster_louvain(g)
+num_communities <- length(communities)
+palette <- rainbow(num_communities) # Or use other palettes like viridis, brewer.pal, etc.
+V(g)$color <- palette[membership(communities)]
+
+
+```
+
+
+We'll use `visIgraph` to generate an interactive version of our network. Just making the graph only requires the `visIgraph(g)` command, so the subsequent steps here are just adjusting some of the aesthetics.
+
+```{r}
+
+
+network<-visIgraph(g)|>
+  visNodes(size=5,
+           font = list(size=5),
+    color = list(background = "lightblue", 
+                 border = "lightblue",
+                 highlight = "yellow"),
+    shadow = list(enabled = TRUE))|>
+  visOptions(highlightNearest = TRUE, width=1920, height=720)|>
+  visEdges(color = list(opacity = 0.3))|>
+  visPhysics(
+    solver = "barnesHut",
+    barnesHut = list(
+      springConstant = 0.04, # Adjust as needed
+      avoidOverlap = 1     # Value between 0 and 1 (1 is max avoidance)
+    )
+  )
+
+network
 
 
 
+```
+
+I can save the results of a network plot for later use like this:
+
+```{r}
+visSave(network, file='network.html')
+
+
+```
 
