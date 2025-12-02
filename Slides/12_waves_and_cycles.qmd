@@ -1,0 +1,352 @@
+---
+title: "Waves and Cycles"
+format:
+  revealjs:
+    theme: [default, custom_styles]
+    df-print: paged
+    smaller: true
+    slide-number: true
+    header: 
+    header-logo: images/informal_seal_transparent.webp
+    self-contained: true
+filters:
+  - reveal-header
+code-annotations: select
+slide-level: 3
+execute:
+  echo: true
+---
+
+## Dependent contention
+
+## Scale shift
+
+Scale shift means moving contention to “a higher or a lower level than its initiation”. Achieved through:
+
+-   Coordination
+
+-   Brokerage
+
+-   Claim shifts
+
+-   Identity shifts
+
+# The cycle of contention
+
+::::: columns
+::: {.column width="50%"}
+1.  Heightened conflict
+
+2.  Geographic and sectoral diffusion
+
+3.  Organizational emergence
+
+4.  New frames and identities
+
+5.  Expansion of the repertoire
+:::
+
+::: {.column width="50%"}
+![](https://upload.wikimedia.org/wikipedia/commons/a/a7/Alexanderplatz_Berlin_1848.jpg)
+:::
+:::::
+
+::: notes
+diffusion: adopting methods of protest elsewhere brokerage: creation of new links between movements
+
+strong expansion of contention across social groups and sectors, superseding the narrow boundaries of policy fields, and often transcending national borders.
+
+upward scale shift: contentious moves to some higher level
+
+Challengers sense an opening and join the action, increasing the available protest resources
+
+Second, protest waves are invariably characterized by a transformation of contention, that is, changes in strategies, alliance structures, identities, and so forth, which inevitably arise in processes of dynamic interaction and ensure that no protest wave ends up where it began.
+:::
+
+## 1960s
+
+::::: columns
+::: {.column width="50%"}
+![](images/total_us.png)
+:::
+
+::: {.column width="50%"}
+-   Widening opportunity, economic boom, postwar instability, youth bulge - among others - lead to heightened racial conflict in the U.S. in the 1950s/1960s
+:::
+:::::
+
+### Sectoral/Geographic Diffusion
+
+::::: columns
+::: {.column width="50%"}
+-   As Civil Rights activism increased, it also moved to new areas - such as the deep south - and invited greater institutional involvement (political parties, charitable organizations, churches, the left, white students etc.)
+:::
+
+::: {.column width="50%"}
+![](https://edu.lva.virginia.gov/ocapi/uploads/1644435637366_freedom-rides-featured.jpg)
+:::
+:::::
+
+### New groups
+
+::::: columns
+::: {.column width="50%"}
+[![](images/civil_rights_organizations.png)](https://www.jstor.org/stable/pdf/684758.pdf)
+:::
+
+::: {.column width="50%"}
+-   As the 60s progressed, new organizations/organizational forms arose to take advantage of the increased resources available for civil rights activism.
+:::
+:::::
+
+### Expanded Repertoire
+
+::::: columns
+::: {.column width="50%"}
+-   Tactical innovations (particularly sit-ins, boycotts, marches and other direct actions) proliferated and became normalized by the 1970s and later more militant activism took their place
+:::
+
+::: {.column width="50%"}
+![](images/protest_tactics.png)
+:::
+:::::
+
+### New claims and identities
+
+::::: columns
+::: {.column width="50%"}
+![](images/civil_rights.png)
+:::
+
+::: {.column width="50%"}
+-   New Civil Rights movements - often deliberately modeled on AA Civil Rights - became more prominent in later decades.
+:::
+:::::
+
+## Color Revolutions
+
+![](images/color_revolutions.png)
+
+## Revolutions of 1848
+
+![](images/Europe_1848_map_de.png)
+
+## Arab Spring
+
+![](images/arab_sprng.png)
+
+## Arab Spring
+
+![](images/arab_protest.png)
+
+## Background: Tunisia
+
+:::::: columns
+:::: {.column width="50%"}
+::: incremental
+-   Gains independence from France in 1956, led by Habib Bourguiba for the next three decades
+-   Zine El Abidine Ben Ali takes power in a bloodless coup in 1987
+-   Ben Ali briefly loosens restrictions on the press, but ultimately formalizes what were previously informal methods of repression
+:::
+::::
+
+::: {.column width="50%"}
+![](https://www.ft.com/__origami/service/image/v2/images/raw/http%3A%2F%2Fcom.ft.imagepublish.upp-prod-eu.s3.amazonaws.com%2Ff7994942-daf9-11e9-8f9b-77216ebe1f17?source=next-article&fit=scale-down&quality=highest&width=700&dpr=1)
+:::
+::::::
+
+## Background: Tunisia
+
+::::: columns
+::: {.column width="50%"}
+![](images/Evolution-of-unemployment-and-inflation-rates-in-Tunisia-en-1970-2019.png)
+:::
+
+::: {.column width="50%"}
+![](images/tunisia_tiger.png)
+:::
+:::::
+
+## Background: Tunisia
+
+::::: columns
+::: {.column width="50%"}
+![](images/tunisia_blocked.png)
+:::
+
+::: {.column width="50%"}
+-   Characterized as a "police state" with poor economic growth, fractured civil society, and worsening corruption
+    -   Tunisia probably more appropriate categorized as a weak hybrid state.
+-   Further exacerbated by what was seen as the opulent lifestyle of Ben Ali and his family
+:::
+:::::
+
+## Arab Spring in Tunisia
+
+::::: columns
+::: {.column width="50%"}
+-   December 17, 2010 Ali Bouazizi self-immolates after his wares are confiscated by police
+
+-   Protests almost immediately after, some activists are arrested but released following a public outcry
+:::
+
+::: {.column width="50%"}
+![](images/tunisia_slap.png)
+:::
+:::::
+
+## Arab Spring in Tunisia
+
+:::::: columns
+:::: {.column width="50%"}
+::: incremental
+-   Police reported to kill hundreds during escalating riots
+
+-   January 13, 2011: Ben Ali promises not to run for office, but also imposes a state of emergency
+
+-   January 14, 2011: Ben Ali flees to Saudi Arabia, Rachid Ghannouchi forms an interim government
+
+-   May - June 2011: Ghannouchi resigns amid continued protests. Ben Ali convicted in absentia
+
+-   October 2011: Tunisia holds parliamentary elections
+:::
+::::
+
+::: {.column width="50%"}
+![](images/tunisia_riots.png)
+:::
+::::::
+
+## Arab Spring: Diffusion
+
+::::: columns
+::: {.column width="50%"}
+-   January 14, 2011: initial unrest in Libya and Jordan
+
+-   January 17, 2011: initial unrest in Egypt
+
+-   January 24, 2011: protests in Yemen
+
+-   February 14, 2011: protests in Bahrain
+:::
+
+::: {.column width="50%"}
+![](images/arab_events.png)
+:::
+:::::
+
+## Arab Spring: Trajectories
+
+::::: columns
+::: {.column width="50%"}
+-   **Egypt:** Mubarak resigns after losing military (and U.S.) support.
+
+-   **Libya:** Qaddafi attempts to retain power. Qaddafi overthrown in a violent coup followed by two civil wars.
+
+-   **Yemen:** Saleh steps down in exchange for immunity. Later factional fighting ultimately leads to civil war that is ongoing today.
+
+-   **Syria:** Assad initially flees, but ultimately holds on through subsequent civil war.
+
+-   **Bahrain:** King Hamad declares a three month state of emergency. Holds on to power
+:::
+
+::: {.column width="50%"}
+![](https://www.journalofdemocracy.org/wp-content/uploads/2021/01/Masoud-Fig1-347x1024.jpg){fig-align="right" width="159"}
+:::
+:::::
+
+## Arab Spring: Outcomes for Tunisia
+
+::::: columns
+::: {.column width="50%"}
+![](images/tunisia_vdem2.png)
+:::
+
+::: {.column width="50%"}
+:::
+:::::
+
+### The cycle
+
+::: incremental
+1.  **Heightened conflict**: sudden emergence of protest in a repressive state
+2.  **Geographic and sectoral diffusion**: expansion to Libya and Syria. Involvement of western powers.
+3.  **New actors**: labor/civil society organizations, "political Islam" organizations and parties
+4.  **Expansion of the repertoire**: regime change, occupy-style protests, civil war (Syria and Libya)
+5.  **New claims**: political Islam, in particular, emerged as an important cleavage in multiple states
+:::
+
+# Issues
+
+-   Why does protest spread in waves? Why did the Arab Spring revolts spread so rapidly - including to countries where they were unlikely to succeed?
+
+-   Why do protests appear to emerge "out of nowhere" and then topple regimes?
+
+
+## Spurious Correlations
+
+Maybe seemingly correlated events are actually just independent reactions to the same events:
+
+-   Post WWII anti-imperialist conflicts coincided with weakness of European empires
+
+-   The post-Soviet wave coincided with the collapse of the USSR
+
+-   Arab Spring happens amid a global recession and regional backlash against the war on terror
+
+  - The Arab spring revolts also mostly emerge in personalist dictatorships that are already vulnerable to collapse.
+
+
+## Thresholds and cascades
+
+::::: columns
+::: {.column width="50%"}
+Assume that:
+
+-   Everyone has a minimal level of safety that they want to have before they'll join a protest. A "threshold to revolt"
+
+-   Every additional participant in a protest makes the event safer. The expectation that others are unhappy can be enough to tip a huge segment of the population to participate.
+:::
+
+::: {.column width="50%"}
+. . .
+
+![](images/threshold.png)
+:::
+:::::
+
+### Thresholds and cascades
+
+Thresholds and cascades might help explain why events like the Arab Spring revolts always seem "surprising":
+
+-   Widespread discontent but no legal outlet for voicing it (corrupt states with limited media freedom)
+
+-   An external shock reveals that public support is weaker than it looks
+
+-   Protest eventually reaches a tipping point where the potential benefits exceed costs for most potential protesters.
+
+
+## Cognitive shortcuts
+
+- Cost-benefit calculations are cognitively hard, so people take mental shortcuts
+
+- The choice to emulate Tunisian protests in Saudi Arabia was based on a view among protesters that both cases were "similar enough" to have similar outcomes. ("representativeness" heuristic)
+
+- Protest spreads even to locations where regimes are strong and the chances of success are extremely low.
+
+## International Support and Coordination
+
+::::: columns
+::: {.column width="50%"}
+-   Regional waves like the Arab Spring may be better understood as the result of changes in a shared *international* opportunity structure
+
+-   6,000+ International NGOs founded since the end of WWII along with some emergent norms in favor of universal human rights.
+
+-   Transnational Advocacy Networks link countries and the International POS
+:::
+
+::: {.column width="50%"}
+![Keck, Margaret E., and Kathryn A. Sikkink. Activists beyond borders: Advocacy networks in international politics. Cornell University Press, 2014.](images/ingo_growth.png)
+:::
+:::::
+
+
